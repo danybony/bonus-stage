@@ -266,6 +266,8 @@
 					"-lsqlite3",
 					"-framework",
 					SafariServices,
+					"-framework",
+					BackgroundTasks,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_BUNDLE_IDENTIFIER}";
 				PRODUCT_NAME = "${PRODUCT_NAME}";
@@ -306,6 +308,8 @@
 					"-lsqlite3",
 					"-framework",
 					SafariServices,
+					"-framework",
+					BackgroundTasks,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_BUNDLE_IDENTIFIER}";
 				PRODUCT_NAME = "${PRODUCT_NAME}";
