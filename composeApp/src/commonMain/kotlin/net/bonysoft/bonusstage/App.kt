@@ -54,6 +54,7 @@ import net.bonysoft.bonusstage.ui.rom.RomScanRoute
 import net.bonysoft.bonusstage.ui.share.RecapRoute
 import net.bonysoft.bonusstage.ui.signin.SignInRoute
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
+import net.bonysoft.bonusstage.ui.transitions.SharedGameTransitions
 import net.bonysoft.bonusstage.ui.wishlist.WishlistRoute
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -95,9 +96,10 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
     val content = remember(backStack) {
         movableContentOf { contentModifier: Modifier ->
         val openGame: (Long) -> Unit = { backStack.add(GameDetail(it)) }
+        SharedGameTransitions(contentModifier) {
         NavDisplay(
             backStack = backStack,
-            modifier = contentModifier,
+            modifier = Modifier.fillMaxSize(),
             onBack = { backStack.removeLastOrNull() },
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
@@ -113,6 +115,7 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
                 entry<GameDetail> { GameDetailRoute(gameId = it.gameId, onBack = { backStack.removeLastOrNull() }) }
             },
         )
+        }
         }
     }
     if (LocalWindowLayout.current.useNavigationRail) {

@@ -1,5 +1,7 @@
 package net.bonysoft.bonusstage.ui.profile
 
+import net.bonysoft.bonusstage.ui.transitions.GamePart
+import net.bonysoft.bonusstage.ui.transitions.sharedGame
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -275,7 +277,10 @@ private fun RecentlyPlayedWindow(games: List<RecentlyPlayedGame>, onOpenGame: (L
                 text = game.title,
                 supportingText = listOfNotNull(game.consoleName, game.lastPlayed?.relativeTo()).joinToString(" · "),
                 onClick = { onOpenGame(game.gameId) },
-                leading = { RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 44.dp) },
+                leading = {
+                    RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 44.dp, modifier = Modifier.sharedGame(game.gameId, GamePart.Icon))
+                },
+                textModifier = Modifier.sharedGame(game.gameId, GamePart.Title),
             )
         }
     }

@@ -39,6 +39,7 @@ fun RetroMenuItem(
     color: Color = RetroTheme.colors.onWindow,
     leading: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
+    textModifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
@@ -60,7 +61,7 @@ fun RetroMenuItem(
         }
         leading?.invoke()
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = text, style = RetroTheme.typography.menu, color = color, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(text = text, style = RetroTheme.typography.menu, color = color, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = textModifier)
             if (supportingText != null) {
                 Text(text = supportingText, style = RetroTheme.typography.label, color = RetroTheme.colors.onWindowMuted)
             }
