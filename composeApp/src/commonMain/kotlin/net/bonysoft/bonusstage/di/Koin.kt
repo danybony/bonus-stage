@@ -8,6 +8,8 @@ import net.bonysoft.bonusstage.data.account.UserDataCleaner
 import net.bonysoft.bonusstage.data.alerts.BackgroundCheckCoordinator
 import net.bonysoft.bonusstage.data.alerts.WishlistAlertChecker
 import net.bonysoft.bonusstage.data.cache.RefreshPolicy
+import net.bonysoft.bonusstage.data.widget.WidgetDataSource
+import net.bonysoft.bonusstage.data.widget.WidgetSync
 import net.bonysoft.bonusstage.data.cache.Refresher
 import net.bonysoft.bonusstage.data.repository.CacheCleaner
 import net.bonysoft.bonusstage.data.repository.GameRepository
@@ -53,6 +55,8 @@ val dataModule = module {
     single { SettingsRepository(get()) }
     single { WishlistAlertChecker(get(), get(), get()) }
     single(createdAtStart = true) { BackgroundCheckCoordinator(get(), get(), get()) }
+    single { WidgetDataSource(get(), get(), get()) }
+    single(createdAtStart = true) { WidgetSync(get(), get(), get()) }
 }
 
 val uiModule = module {

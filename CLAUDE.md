@@ -6,8 +6,8 @@ The full plan, with the research behind it, is in `docs/plan.md` (Italian). Deci
 
 ## Architecture
 
-- `composeApp/` – the shared app, a KMP library. `commonMain` holds UI (Compose Multiplatform), domain (use cases), data (repositories, SQLDelight cache), navigation (Navigation 3, destinations in `navigation/`) and DI (Koin, modules in `di/`). `androidMain` and `iosMain` hold only platform glue: encrypted credential storage, background work, the iOS view controller.
-- `androidApp/` – the Android application module: `Application`, `MainActivity`, manifest, widgets. AGP 9 does not allow the application plugin in a KMP module, so the Android entry point lives here and depends on `composeApp`.
+- `composeApp/` – the shared app, a KMP library. `commonMain` holds UI (Compose Multiplatform), domain (use cases), data (repositories, SQLDelight cache), navigation (Navigation 3, destinations in `navigation/`) and DI (Koin, modules in `di/`). `androidMain` and `iosMain` hold only platform glue: encrypted credential storage, background work, notifications, the Glance widget (it needs the shared data), the iOS view controller.
+- `androidApp/` – the Android application module: `Application`, `MainActivity`, manifest, debug-only tools. AGP 9 does not allow the application plugin in a KMP module, so the Android entry point lives here and depends on `composeApp`.
 - `ra-api/` – KMP library: Ktor client and kotlinx.serialization models for the RA Web API. No app logic. Also has a plain `jvm` target for the daily contract tests, so the app and the CI check use the same models.
 - `iosApp/` – Xcode project hosting the shared UI. Its build phase runs `:composeApp:embedAndSignAppleFrameworkForXcode`.
 
@@ -62,6 +62,7 @@ Requires JDK 17+ (CI uses 21) and an Android SDK with `sdk.dir` in `local.proper
 | --- | --- |
 | Build the Android app | `./gradlew :androidApp:assembleDebug` |
 | Run the wishlist set check now (debug build) | `adb shell am broadcast -a net.bonysoft.bonusstage.debug.CHECK_WISHLIST -p net.bonysoft.bonusstage` |
+| Add the home screen widget (debug build, app in the foreground) | `adb shell am broadcast -a net.bonysoft.bonusstage.debug.PIN_WIDGET -p net.bonysoft.bonusstage` |
 | Install and run on a device or emulator | `./gradlew :androidApp:installDebug`, then `adb shell am start -n net.bonysoft.bonusstage/.MainActivity` |
 | Shared tests on the JVM (what CI runs on Linux) | `./gradlew :composeApp:testAndroidHostTest :ra-api:jvmTest :ra-api:testAndroidHostTest` |
 | Shared tests on the iOS simulator (macOS) | `./gradlew :composeApp:iosSimulatorArm64Test :ra-api:iosSimulatorArm64Test` |

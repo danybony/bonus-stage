@@ -63,6 +63,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.sqldelight.android.driver)
             implementation(libs.androidx.work.runtime)
+            implementation(libs.glance.appwidget)
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.activity.compose)
         }

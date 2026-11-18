@@ -6,6 +6,7 @@ import net.bonysoft.bonusstage.data.alerts.AlertNotifier
 import net.bonysoft.bonusstage.data.alerts.BackgroundChecks
 import net.bonysoft.bonusstage.data.alerts.WishlistAlertChecker
 import net.bonysoft.bonusstage.data.createTestDatabase
+import net.bonysoft.bonusstage.data.widget.WidgetUpdater
 import net.bonysoft.bonusstage.db.BonusStageDatabase
 import net.bonysoft.bonusstage.di.dataModule
 import net.bonysoft.bonusstage.di.uiModule
@@ -25,6 +26,7 @@ class KoinModulesTest {
             }
         }
         single<AlertNotifier> { AlertNotifier { } }
+        single<WidgetUpdater> { WidgetUpdater { } }
         single<BackgroundChecks> {
             object : BackgroundChecks {
                 override fun schedule() = Unit
