@@ -9,6 +9,7 @@
             xmlns:tools="http://schemas.android.com/tools">
             <intent-filter>
                 <action android:name="net.bonysoft.bonusstage.debug.CHECK_WISHLIST" />
+                <action android:name="net.bonysoft.bonusstage.debug.PIN_WIDGET" />
             </intent-filter>
         </receiver>
     </application>

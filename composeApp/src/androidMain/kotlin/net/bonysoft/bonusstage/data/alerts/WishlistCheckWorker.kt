@@ -9,6 +9,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import io.ktor.utils.io.CancellationException
+import net.bonysoft.bonusstage.data.repository.RecentAchievementsRepository
 import net.bonysoft.bonusstage.raapi.RaApiException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -30,21 +31,49 @@ class WishlistCheckWorker(context: Context, params: WorkerParameters) : Coroutin
     }
 }
 
-/** A few checks a day, only with a network, kept across reboots by WorkManager. */
+/** Polls recent unlocks for the widget (CLAUDE.md: "Recent achievements, widget: background polling"). */
+class RecentSyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params), KoinComponent {
+
+    override suspend fun doWork(): Result = try {
+        // WidgetSync redraws the widget when the cache changes.
+        get<RecentAchievementsRepository>().refresh()
+        Result.success()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (_: RaApiException.Unauthorized) {
+        Result.success()
+    } catch (_: RaApiException) {
+        Result.retry()
+    }
+}
+
+/** Periodic background work, only with a network, kept across reboots by WorkManager. */
 class WorkManagerBackgroundChecks(private val context: Context) : BackgroundChecks {
 
     override fun schedule() {
-        val request = PeriodicWorkRequestBuilder<WishlistCheckWorker>(6, TimeUnit.HOURS)
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .build()
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request)
+        val network = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        val workManager = WorkManager.getInstance(context)
+        workManager.enqueueUniquePeriodicWork(
+            WISHLIST_WORK,
+            ExistingPeriodicWorkPolicy.KEEP,
+            PeriodicWorkRequestBuilder<WishlistCheckWorker>(6, TimeUnit.HOURS).setConstraints(network).build(),
+        )
+        workManager.enqueueUniquePeriodicWork(
+            RECENT_WORK,
+            ExistingPeriodicWorkPolicy.KEEP,
+            PeriodicWorkRequestBuilder<RecentSyncWorker>(1, TimeUnit.HOURS).setConstraints(network).build(),
+        )
     }
 
     override fun cancel() {
-        WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
+        WorkManager.getInstance(context).apply {
+            cancelUniqueWork(WISHLIST_WORK)
+            cancelUniqueWork(RECENT_WORK)
+        }
     }
 
     private companion object {
-        const val WORK_NAME = "wishlist-set-check"
+        const val WISHLIST_WORK = "wishlist-set-check"
+        const val RECENT_WORK = "recent-sync"
     }
 }

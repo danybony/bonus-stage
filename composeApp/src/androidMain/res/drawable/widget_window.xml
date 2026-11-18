@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The retro window frame: dark outline, white bevel, cream fill (RetroWindow on the home screen). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FF1B1A33" />
+        </shape>
+    </item>
+    <item android:bottom="3dp" android:left="3dp" android:right="3dp" android:top="3dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+    <item android:bottom="3dp" android:left="5dp" android:right="3dp" android:top="5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFF6EEDC" />
+        </shape>
+    </item>
+</layer-list>

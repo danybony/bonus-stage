@@ -7,6 +7,7 @@ androidx-activity = "1.13.0"
 androidx-core = "1.19.1"
 androidx-lifecycle = "2.11.0"
 androidx-work = "2.12.0"
+glance = "1.2.0"
 coil = "3.6.3"
 compose-multiplatform = "1.12.2"
 koin = "4.2.2"
@@ -28,6 +29,7 @@ androidx-lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.li
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
+glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-multiplatform" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
