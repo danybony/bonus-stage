@@ -1,5 +1,7 @@
 package net.bonysoft.bonusstage.ui.game
 
+import net.bonysoft.bonusstage.ui.transitions.GamePart
+import net.bonysoft.bonusstage.ui.transitions.sharedGame
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -201,12 +203,17 @@ private fun GameHeader(game: GameDetail) {
     val (tag, title) = splitTitleTag(game.title)
     RetroWindow(title = stringResource(Res.string.game_info), modifier = Modifier.fillMaxWidth()) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 96.dp)
+            RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 96.dp, modifier = Modifier.sharedGame(game.id, GamePart.Icon))
             Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {
-                Text(title, style = RetroTheme.typography.title, color = colors.onWindow)
+                Text(title, style = RetroTheme.typography.title, color = colors.onWindow, modifier = Modifier.sharedGame(game.id, GamePart.Title))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                     if (tag != null) RetroTag(tag.uppercase(), colors.onWindowMuted)
-                    Text(game.consoleName, style = RetroTheme.typography.label, color = colors.onWindowMuted)
+                    Text(
+                        game.consoleName,
+                        style = RetroTheme.typography.label,
+                        color = colors.onWindowMuted,
+                        modifier = Modifier.sharedGame(game.id, GamePart.Console),
+                    )
                 }
             }
         }

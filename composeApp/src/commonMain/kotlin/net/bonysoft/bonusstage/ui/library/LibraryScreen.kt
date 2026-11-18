@@ -1,5 +1,7 @@
 package net.bonysoft.bonusstage.ui.library
 
+import net.bonysoft.bonusstage.ui.transitions.GamePart
+import net.bonysoft.bonusstage.ui.transitions.sharedGame
 import net.bonysoft.bonusstage.ui.adaptive.AdaptiveList
 import net.bonysoft.bonusstage.ui.adaptive.fullLineItem
 import androidx.compose.foundation.clickable
@@ -188,12 +190,26 @@ internal fun GameRow(game: LibraryGame, onClick: () -> Unit, modifier: Modifier 
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 64.dp)
+        RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 64.dp, modifier = Modifier.sharedGame(game.id, GamePart.Icon))
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(title, style = RetroTheme.typography.menu, color = colors.onWindow, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(
+                title,
+                style = RetroTheme.typography.menu,
+                color = colors.onWindow,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.sharedGame(game.id, GamePart.Title),
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (tag != null) RetroTag(tag.uppercase(), colors.onWindowMuted)
-                Text(game.consoleName, style = RetroTheme.typography.label, color = colors.onWindowMuted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                Text(
+                    game.consoleName,
+                    style = RetroTheme.typography.label,
+                    color = colors.onWindowMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false).sharedGame(game.id, GamePart.Console),
+                )
                 game.award?.let { AwardTag(it) }
             }
             if (game.achievementsTotal > 0) {

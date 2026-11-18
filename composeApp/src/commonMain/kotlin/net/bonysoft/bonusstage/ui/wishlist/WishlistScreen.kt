@@ -1,5 +1,7 @@
 package net.bonysoft.bonusstage.ui.wishlist
 
+import net.bonysoft.bonusstage.ui.transitions.GamePart
+import net.bonysoft.bonusstage.ui.transitions.sharedGame
 import net.bonysoft.bonusstage.ui.adaptive.AdaptiveList
 import net.bonysoft.bonusstage.ui.adaptive.fullLineItem
 import androidx.compose.foundation.clickable
@@ -160,12 +162,26 @@ private fun WishlistRow(game: WishlistGame, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 56.dp)
+        RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 56.dp, modifier = Modifier.sharedGame(game.gameId, GamePart.Icon))
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Text(title, style = RetroTheme.typography.menu, color = colors.onWindow, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(
+                title,
+                style = RetroTheme.typography.menu,
+                color = colors.onWindow,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.sharedGame(game.gameId, GamePart.Title),
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (tag != null) RetroTag(tag.uppercase(), colors.onWindowMuted)
-                Text(game.consoleName, style = RetroTheme.typography.label, color = colors.onWindowMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    game.consoleName,
+                    style = RetroTheme.typography.label,
+                    color = colors.onWindowMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.sharedGame(game.gameId, GamePart.Console),
+                )
             }
             when (val status = game.status) {
                 is SetStatus.InDevelopment -> {
