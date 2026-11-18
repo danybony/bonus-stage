@@ -264,6 +264,8 @@
 					"-framework",
 					ComposeApp,
 					"-lsqlite3",
+					"-framework",
+					SafariServices,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_BUNDLE_IDENTIFIER}";
 				PRODUCT_NAME = "${PRODUCT_NAME}";
@@ -302,6 +304,8 @@
 					"-framework",
 					ComposeApp,
 					"-lsqlite3",
+					"-framework",
+					SafariServices,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${PRODUCT_BUNDLE_IDENTIFIER}";
 				PRODUCT_NAME = "${PRODUCT_NAME}";
