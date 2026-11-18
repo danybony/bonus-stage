@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">Bonus Stage</string>
+
+    <string name="sign_in_tagline">Your RetroAchievements, in your pocket.</string>
+    <string name="sign_in_title">SIGN IN</string>
+    <string name="sign_in_username">RetroAchievements username</string>
+    <string name="sign_in_api_key">Web API key</string>
+    <string name="sign_in_key_help">Find your key on retroachievements.org: Settings, then the Keys section. It is stored encrypted on this device and only sent to RetroAchievements.</string>
+    <string name="sign_in_open_settings">Open RA settings</string>
+    <string name="sign_in_button">Sign in</string>
+    <string name="sign_in_checking">Checking…</string>
+    <string name="sign_in_demo">Try the demo</string>
+    <string name="sign_in_demo_help">No account? Look around with a demo profile.</string>
+    <string name="sign_in_show_key">Show key</string>
+    <string name="sign_in_hide_key">Hide key</string>
+    <string name="sign_in_unofficial">Unofficial app, not affiliated with RetroAchievements.</string>
+
+    <string name="error_unauthorized">RetroAchievements rejected this username and key. Check both and try again.</string>
+    <string name="error_not_found">No RetroAchievements user with this name.</string>
+    <string name="error_rate_limited">Too many requests. Wait a minute and try again.</string>
+    <string name="error_network">Could not reach RetroAchievements. Check your connection.</string>
+    <string name="error_unexpected">RetroAchievements answered with something unexpected. Try again later.</string>
+    <string name="error_server">RetroAchievements is having trouble (HTTP %1$d). Try again later.</string>
+    <string name="error_missing_fields">Enter your username and web API key.</string>
+
+    <string name="sign_out">Sign out</string>
+    <string name="sign_out_title">SIGN OUT?</string>
+    <string name="sign_out_text">Your key and the cached data will be removed from this device.</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

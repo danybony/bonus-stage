@@ -1,14 +1,31 @@
 package net.bonysoft.bonusstage
 
-import net.bonysoft.bonusstage.di.appModule
-import org.koin.core.annotation.KoinExperimentalAPI
-import org.koin.test.verify.verify
+import net.bonysoft.bonusstage.data.account.AccountRepository
+import net.bonysoft.bonusstage.data.account.CredentialStore
+import net.bonysoft.bonusstage.di.dataModule
+import net.bonysoft.bonusstage.di.uiModule
+import org.koin.dsl.koinApplication
+import org.koin.dsl.module
 import kotlin.test.Test
+import kotlin.test.assertNotNull
 
 class KoinModulesTest {
-    @OptIn(KoinExperimentalAPI::class)
+
+    private val fakePlatform = module {
+        single<CredentialStore> {
+            object : CredentialStore {
+                override suspend fun load(): String? = null
+                override suspend fun save(value: String) = Unit
+                override suspend fun clear() = Unit
+            }
+        }
+    }
+
     @Test
-    fun appModuleResolves() {
-        appModule.verify()
+    fun dataModulesResolve() {
+        val koin = koinApplication { modules(fakePlatform, dataModule, uiModule) }.koin
+
+        assertNotNull(koin.get<AccountRepository>())
+        koin.close()
     }
 }

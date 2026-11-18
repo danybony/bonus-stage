@@ -53,6 +53,8 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
+            // Serves the bundled demo account (DemoEngine).
+            implementation(libs.ktor.client.mock)
         }
         androidMain.dependencies {
             implementation(libs.koin.android)
