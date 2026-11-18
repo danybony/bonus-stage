@@ -1,5 +1,6 @@
 package net.bonysoft.bonusstage.ui.wishlist
 
+import net.bonysoft.bonusstage.ui.transitions.GameOrigin
 import net.bonysoft.bonusstage.ui.transitions.GamePart
 import net.bonysoft.bonusstage.ui.transitions.sharedGame
 import net.bonysoft.bonusstage.ui.adaptive.AdaptiveList
@@ -181,7 +182,7 @@ private fun WishlistRow(game: WishlistGame, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 56.dp, modifier = Modifier.sharedGame(game.gameId, GamePart.Icon))
+        RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 56.dp, modifier = Modifier.sharedGame(game.gameId, GamePart.Icon, GameOrigin.Wishlist))
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Text(
                 title,
@@ -189,17 +190,17 @@ private fun WishlistRow(game: WishlistGame, onClick: () -> Unit) {
                 color = colors.onWindow,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.sharedGame(game.gameId, GamePart.Title),
+                modifier = Modifier.sharedGame(game.gameId, GamePart.Title, GameOrigin.Wishlist),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (tag != null) RetroTag(tag.uppercase(), colors.onWindowMuted)
+                if (tag != null) RetroTag(tag.uppercase(), colors.onWindowMuted, Modifier.sharedGame(game.gameId, GamePart.Tag, GameOrigin.Wishlist))
                 Text(
                     game.consoleName,
                     style = RetroTheme.typography.label,
                     color = colors.onWindowMuted,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.sharedGame(game.gameId, GamePart.Console),
+                    modifier = Modifier.sharedGame(game.gameId, GamePart.Console, GameOrigin.Wishlist),
                 )
             }
             when (val status = game.status) {

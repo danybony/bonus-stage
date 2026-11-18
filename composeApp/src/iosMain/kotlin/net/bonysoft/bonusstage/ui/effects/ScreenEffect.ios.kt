@@ -16,6 +16,7 @@ actual fun Modifier.screenEffect(effect: ScreenEffect): Modifier {
     return graphicsLayer {
         builder.uniform("resolution", size.width, size.height)
         builder.uniform("mode", effect.shaderMode())
+        builder.uniform("scale", density)
         renderEffect = ImageFilter.makeRuntimeShader(builder, "content", null).asComposeRenderEffect()
     }
 }

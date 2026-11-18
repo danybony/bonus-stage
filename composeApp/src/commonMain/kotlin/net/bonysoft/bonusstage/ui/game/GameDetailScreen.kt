@@ -1,5 +1,6 @@
 package net.bonysoft.bonusstage.ui.game
 
+import net.bonysoft.bonusstage.ui.transitions.GameOrigin
 import net.bonysoft.bonusstage.ui.transitions.GamePart
 import net.bonysoft.bonusstage.ui.transitions.sharedGame
 import androidx.compose.foundation.clickable
@@ -95,6 +96,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun GameDetailRoute(
     gameId: Long,
+    origin: GameOrigin,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GameDetailViewModel = koinViewModel(key = "game-$gameId") { parametersOf(gameId) },
@@ -102,6 +104,7 @@ fun GameDetailRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     GameDetailScreen(
         state = state,
+        origin = origin,
         onBack = onBack,
         onRefresh = viewModel::refresh,
         onToggleSpoilers = { viewModel.setHideSpoilers(!state.hideSpoilers) },
@@ -112,6 +115,7 @@ fun GameDetailRoute(
 @Composable
 fun GameDetailScreen(
     state: GameDetailUiState,
+    origin: GameOrigin,
     onBack: () -> Unit,
     onRefresh: () -> Unit,
     onToggleSpoilers: () -> Unit,
@@ -162,16 +166,16 @@ fun GameDetailScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         state.status.error?.let { StaleNotice(it) }
-                        GameHeader(game)
-                        ProgressWindow(game, onShare = { sharing = true })
+                        GameHeader(game, origin)
+                        ProgressWindow(game, origin, onShare = { sharing = true })
                     }
                     AdaptiveList(modifier = Modifier.weight(0.6f), spacing = 16.dp, content = achievements)
                 }
             } else {
                 AdaptiveList(spacing = 16.dp) {
                     state.status.error?.let { error -> fullLineItem(key = "stale") { StaleNotice(error) } }
-                    fullLineItem(key = "header") { GameHeader(game) }
-                    fullLineItem(key = "progress") { ProgressWindow(game, onShare = { sharing = true }) }
+                    fullLineItem(key = "header") { GameHeader(game, origin) }
+                    fullLineItem(key = "progress") { ProgressWindow(game, origin, onShare = { sharing = true }) }
                     achievements()
                 }
             }
@@ -198,21 +202,21 @@ fun GameDetailScreen(
 }
 
 @Composable
-private fun GameHeader(game: GameDetail) {
+private fun GameHeader(game: GameDetail, origin: GameOrigin) {
     val colors = RetroTheme.colors
     val (tag, title) = splitTitleTag(game.title)
     RetroWindow(title = stringResource(Res.string.game_info), modifier = Modifier.fillMaxWidth()) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 96.dp, modifier = Modifier.sharedGame(game.id, GamePart.Icon))
+            RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 96.dp, modifier = Modifier.sharedGame(game.id, GamePart.Icon, origin))
             Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {
-                Text(title, style = RetroTheme.typography.title, color = colors.onWindow, modifier = Modifier.sharedGame(game.id, GamePart.Title))
+                Text(title, style = RetroTheme.typography.title, color = colors.onWindow, modifier = Modifier.sharedGame(game.id, GamePart.Title, origin))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (tag != null) RetroTag(tag.uppercase(), colors.onWindowMuted)
+                    if (tag != null) RetroTag(tag.uppercase(), colors.onWindowMuted, Modifier.sharedGame(game.id, GamePart.Tag, origin))
                     Text(
                         game.consoleName,
                         style = RetroTheme.typography.label,
                         color = colors.onWindowMuted,
-                        modifier = Modifier.sharedGame(game.id, GamePart.Console),
+                        modifier = Modifier.sharedGame(game.id, GamePart.Console, origin),
                     )
                 }
             }
@@ -237,7 +241,7 @@ private fun GameHeader(game: GameDetail) {
 }
 
 @Composable
-private fun ProgressWindow(game: GameDetail, onShare: () -> Unit) {
+private fun ProgressWindow(game: GameDetail, origin: GameOrigin, onShare: () -> Unit) {
     val colors = RetroTheme.colors
     val total = game.achievements.size
     val progress = if (total == 0) 0f else game.unlocked.toFloat() / total
@@ -245,7 +249,7 @@ private fun ProgressWindow(game: GameDetail, onShare: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("${progress.asPercent()}%", style = RetroTheme.typography.display, color = game.award?.color(colors) ?: colors.progress)
             Spacer(Modifier.weight(1f))
-            game.award?.let { AwardTag(it) }
+            game.award?.let { AwardTag(it, Modifier.sharedGame(game.id, GamePart.Award, origin)) }
         }
         Spacer(Modifier.height(8.dp))
         RetroProgressBar(progress = progress, color = game.award?.color(colors) ?: colors.progress)
