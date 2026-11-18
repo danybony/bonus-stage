@@ -47,7 +47,9 @@ class GameRepository(
                 title = game.title,
                 consoleName = game.console_name,
                 iconUrl = RaMedia.image(game.image_icon),
-                boxArtUrl = game.image_box_art?.let(RaMedia::image),
+                boxArtUrl = mediaUrl(game.image_box_art),
+                titleScreenUrl = mediaUrl(game.image_title),
+                inGameUrl = mediaUrl(game.image_ingame),
                 publisher = game.publisher?.takeIf { it.isNotBlank() },
                 developer = game.developer?.takeIf { it.isNotBlank() },
                 genre = game.genre?.takeIf { it.isNotBlank() },
@@ -82,7 +84,8 @@ class GameRepository(
                 queries.insertGameIfMissing(info.id, info.title, info.consoleId.toLong(), info.consoleName, info.imageIcon)
                 queries.updateGame(
                     title = info.title, consoleId = info.consoleId.toLong(), consoleName = info.consoleName,
-                    imageIcon = info.imageIcon, imageBoxArt = info.imageBoxArt, publisher = info.publisher,
+                    imageIcon = info.imageIcon, imageBoxArt = info.imageBoxArt, imageTitle = info.imageTitle,
+                    imageIngame = info.imageIngame, publisher = info.publisher,
                     developer = info.developer, genre = info.genre, released = info.released,
                     numPlayers = info.numDistinctPlayers.toLong(), id = info.id,
                 )
@@ -121,4 +124,12 @@ class GameRepository(
     }
 
     private fun resource(ulid: String, gameId: Long) = "game:$ulid:$gameId"
+
+    /** RA fills missing pictures with a generic placeholder, which is not worth showing. */
+    private fun mediaUrl(path: String?): String? =
+        path?.takeIf { it.isNotBlank() && !it.endsWith(PLACEHOLDER_IMAGE) }?.let(RaMedia::image)
+
+    private companion object {
+        const val PLACEHOLDER_IMAGE = "/000002.png"
+    }
 }

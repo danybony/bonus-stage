@@ -80,6 +80,10 @@
     <string name="close">Close</string>
 
     <string name="game_info">INFO</string>
+    <string name="game_media">SCREENS</string>
+    <string name="media_title_screen">Title screen</string>
+    <string name="media_in_game">In game</string>
+    <string name="media_box_art">Box art</string>
     <string name="game_progress">PROGRESS</string>
     <string name="game_achievements">ACHIEVEMENTS</string>
     <string name="game_publisher">Publisher</string>

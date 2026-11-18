@@ -50,6 +50,8 @@ object DemoData {
         val genre: String? = null,
         val released: String? = null,
         val boxArt: String? = null,
+        val titleScreen: String? = null,
+        val inGame: String? = null,
     )
 
     private val games = listOf(
@@ -57,6 +59,7 @@ object DemoData {
             id = 1, title = "Sonic the Hedgehog", consoleId = 1, consoleName = "Mega Drive / Genesis",
             icon = "/Images/067895.png", firstBadge = 250336, publisher = "Sega", genre = "2D Platforming",
             released = "1991-06-23", boxArt = "/Images/051872.png",
+            titleScreen = "/Images/054993.png", inGame = "/Images/000010.png",
             achievements = listOf(
                 DemoAchievement("That Was Easy", "Complete the first act in Green Hill Zone", 3, "progression"),
                 DemoAchievement("Ring Hoarder", "Hold 200 rings at once", 10),
@@ -79,6 +82,7 @@ object DemoData {
             id = 15758, title = "Crazy Kong", consoleId = 27, consoleName = "Arcade",
             icon = "/Images/068578.png", firstBadge = 325551, publisher = "Falcon", genre = "2D Platforming, Arcade",
             released = "1981", boxArt = "/Images/068205.png",
+            titleScreen = "/Images/068579.png", inGame = "/Images/068580.png",
             achievements = listOf(
                 DemoAchievement("Prodigy of the Arcade", "Score 200,000 points", 25),
                 DemoAchievement("Barrel Hopper", "Jump over 20 barrels in one game", 5),
@@ -193,7 +197,8 @@ object DemoData {
         val game = games.firstOrNull { it.id == gameId } ?: return null
         return GameInfoAndUserProgress(
             id = game.id, title = game.title, consoleId = game.consoleId, consoleName = game.consoleName,
-            imageIcon = game.icon, imageBoxArt = game.boxArt, publisher = game.publisher, genre = game.genre,
+            imageIcon = game.icon, imageBoxArt = game.boxArt, imageTitle = game.titleScreen,
+            imageIngame = game.inGame, publisher = game.publisher, genre = game.genre,
             released = game.released, numDistinctPlayers = 12_000 + (game.id % 5_000).toInt(),
             numAchievements = game.achievements.size,
             achievements = game.achievements.mapIndexed { index, achievement ->

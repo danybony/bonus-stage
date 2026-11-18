@@ -96,6 +96,8 @@ class RepositoriesTest {
         assertEquals("Sega", sonic.publisher)
         assertTrue(sonic.achievements.first().isUnlocked)
         assertEquals("That Was Easy", sonic.achievements.first().title, "achievements keep the set's display order")
+        assertEquals("https://media.retroachievements.org/Images/054993.png", sonic.titleScreenUrl)
+        assertEquals("https://media.retroachievements.org/Images/000010.png", sonic.inGameUrl)
     }
 
     @Test
