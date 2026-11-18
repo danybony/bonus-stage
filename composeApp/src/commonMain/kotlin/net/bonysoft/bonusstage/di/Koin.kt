@@ -12,6 +12,7 @@ import net.bonysoft.bonusstage.data.widget.WidgetDataSource
 import net.bonysoft.bonusstage.data.widget.WidgetSync
 import net.bonysoft.bonusstage.data.cache.Refresher
 import net.bonysoft.bonusstage.data.repository.CacheCleaner
+import net.bonysoft.bonusstage.data.repository.CatalogRepository
 import net.bonysoft.bonusstage.data.repository.FriendsRepository
 import net.bonysoft.bonusstage.data.repository.GameRepository
 import net.bonysoft.bonusstage.data.repository.LibraryRepository
@@ -28,6 +29,7 @@ import net.bonysoft.bonusstage.ui.profile.ProfileViewModel
 import net.bonysoft.bonusstage.ui.recent.FriendsViewModel
 import net.bonysoft.bonusstage.ui.recent.RecentViewModel
 import net.bonysoft.bonusstage.ui.rom.RomScanViewModel
+import net.bonysoft.bonusstage.ui.search.GameSearchViewModel
 import net.bonysoft.bonusstage.ui.share.RecapViewModel
 import net.bonysoft.bonusstage.ui.signin.SignInViewModel
 import net.bonysoft.bonusstage.ui.wishlist.WishlistViewModel
@@ -62,7 +64,8 @@ val dataModule = module {
     single { FriendsRepository(get(), get(), get(), get()) }
     single { RecapRepository(get()) }
     // RomLibrary comes from the platform (Android only for now); resolved only when scanning.
-    single { RomScanRepository(get(), get(), get(), get(), get()) }
+    single { CatalogRepository(get(), get(), get(), get()) }
+    single { RomScanRepository(get(), get(), get()) }
     single { WishlistAlertChecker(get(), get(), get()) }
     single(createdAtStart = true) { BackgroundCheckCoordinator(get(), get(), get()) }
     single { WidgetDataSource(get(), get(), get()) }
@@ -77,6 +80,7 @@ val uiModule = module {
     viewModelOf(::FriendsViewModel)
     viewModelOf(::RecapViewModel)
     viewModelOf(::RomScanViewModel)
+    viewModelOf(::GameSearchViewModel)
     viewModelOf(::WishlistViewModel)
     viewModel { (gameId: Long) -> GameDetailViewModel(gameId, get(), get(), get()) }
 }

@@ -1,0 +1,5 @@
+-- Version 4 to 5: the console list, for the catalog search.
+CREATE TABLE console (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL
+);

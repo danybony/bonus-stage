@@ -37,6 +37,9 @@ class WishlistRepository(
     /** Current wishlist read straight from the cache, for background checks. */
     fun cachedWishlist(): List<WishlistGame> = queries.wishlist(accounts.requireUlid()).executeAsList().map { it.toDomain() }
 
+    /** The user may have changed the list on the website: refetch it on the next refresh. */
+    fun markStale() = refresher.invalidate("wishlist:${accounts.requireUlid()}")
+
     suspend fun refresh(force: Boolean = false): Boolean {
         val ulid = accounts.requireUlid()
         return refresher.refresh("wishlist:$ulid", policy.wishlist, force) {

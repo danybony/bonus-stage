@@ -6,6 +6,7 @@ import io.ktor.client.engine.mock.respondError
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import net.bonysoft.bonusstage.data.account.AccountRepository
@@ -163,5 +164,33 @@ class RepositoriesTest {
         val feed = friends.observeFeed().first()
         assertEquals(setOf("PixelPilgrim", "CartridgeKid", "SoftcoreSam"), feed.map { it.friendName }.toSet())
         assertTrue(feed.zipWithNext().all { (a, b) -> a.unlockedAt >= b.unlockedAt })
+    }
+
+    @Test
+    fun catalogSyncsOncePerConsoleAndSearches() = runTest {
+        val accounts = signedInDemo()
+        val catalog = CatalogRepository(database, accounts, refresher, policy, Dispatchers.Unconfined)
+
+        val progress = catalog.syncAll().toList()
+        val callsAfterFirstSync = apiCalls
+        catalog.syncAll().toList()
+
+        assertTrue(progress.last().isComplete)
+        assertEquals(1 + progress.last().total, callsAfterFirstSync, "console list plus one call per console")
+        assertEquals(callsAfterFirstSync, apiCalls, "a fresh catalog is not fetched again")
+        assertEquals(listOf("Mega Man"), catalog.search("mega").map { it.title })
+        assertEquals("~Homebrew~ No Place To Hide", catalog.search("place").single().title, "games without a set are searchable")
+        assertTrue(catalog.search("s").isEmpty(), "one letter is too short to search")
+    }
+
+    @Test
+    fun wishlistMarkedStaleIsFetchedAgain() = runTest {
+        val accounts = signedInDemo()
+        val wishlist = WishlistRepository(database, accounts, refresher, policy, Dispatchers.Unconfined)
+        wishlist.refresh()
+
+        wishlist.markStale()
+
+        assertTrue(wishlist.refresh(), "refetched although younger than the wishlist interval")
     }
 }

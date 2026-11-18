@@ -21,6 +21,11 @@ class Refresher(
     fun fetchedAt(resource: String): Instant? =
         database.cacheQueries.fetchedAt(resource).executeAsOneOrNull()?.let(Instant::fromEpochMilliseconds)
 
+    /** Makes [resource] stale, so its next refresh calls the API whatever its age. */
+    fun invalidate(resource: String) {
+        database.cacheQueries.invalidate(resource)
+    }
+
     /** Returns true when [fetch] ran. Exceptions from [fetch] propagate and leave the resource stale. */
     suspend fun refresh(resource: String, maxAge: Duration, force: Boolean, fetch: suspend () -> Unit): Boolean {
         val lock = locksGuard.withLock { locks.getOrPut(resource) { Mutex() } }

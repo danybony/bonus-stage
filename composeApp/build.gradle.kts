@@ -65,6 +65,7 @@ kotlin {
             implementation(libs.androidx.work.runtime)
             implementation(libs.glance.appwidget)
             implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.browser)
             implementation(libs.androidx.activity.compose)
         }
         iosMain.dependencies {
