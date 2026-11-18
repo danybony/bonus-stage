@@ -12,8 +12,10 @@ import net.bonysoft.bonusstage.data.repository.GameRepository
 import net.bonysoft.bonusstage.data.repository.LibraryRepository
 import net.bonysoft.bonusstage.data.repository.ProfileRepository
 import net.bonysoft.bonusstage.data.repository.RecentAchievementsRepository
+import net.bonysoft.bonusstage.data.repository.SettingsRepository
 import net.bonysoft.bonusstage.data.repository.WishlistRepository
 import net.bonysoft.bonusstage.db.BonusStageDatabase
+import net.bonysoft.bonusstage.ui.game.GameDetailViewModel
 import net.bonysoft.bonusstage.ui.library.LibraryViewModel
 import net.bonysoft.bonusstage.ui.profile.ProfileViewModel
 import net.bonysoft.bonusstage.ui.signin.SignInViewModel
@@ -22,6 +24,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -43,12 +46,14 @@ val dataModule = module {
     single { GameRepository(get(), get(), get(), get()) }
     single { RecentAchievementsRepository(get(), get(), get(), get()) }
     single { WishlistRepository(get(), get(), get(), get()) }
+    single { SettingsRepository(get()) }
 }
 
 val uiModule = module {
     viewModelOf(::SignInViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::LibraryViewModel)
+    viewModel { (gameId: Long) -> GameDetailViewModel(gameId, get(), get()) }
 }
 
 val appModules = listOf(platformModule, dataModule, uiModule)

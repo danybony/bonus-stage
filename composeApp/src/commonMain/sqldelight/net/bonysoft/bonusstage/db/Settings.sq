@@ -1,0 +1,11 @@
+-- Device preferences. Not user data: kept across sign-out.
+CREATE TABLE app_setting (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+setting:
+SELECT value FROM app_setting WHERE key = ?;
+
+putSetting:
+INSERT OR REPLACE INTO app_setting(key, value) VALUES (?, ?);

@@ -37,6 +37,8 @@ Cache-first, local only, no backend. Show cached data immediately, refresh after
 | Recent achievements, widget | background polling |
 | Wishlist and active claims | background polling, a few times a day |
 
+Every change to an existing table or a new table needs a migration in `composeApp/src/commonMain/sqldelight/migrations/<version>.sqm` (the app may already have an older database). `Settings.sq` holds device preferences that survive sign-out; `Cache.sq` is wiped by `CacheCleaner`.
+
 ## Visual style (ADR 0004)
 
 Retro, inspired by PokeDaisy (https://github.com/lidor30/pokedaisy): pixel fonts, screens styled after classic game menus, optional LCD/scanline/CRT effects later. Inspiration only: PokeDaisy is GPL-3.0, so never copy its code or assets into this repository. Check the license of every font and asset before adding it, and record it in `docs/assets.md`.
