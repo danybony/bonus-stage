@@ -6,9 +6,14 @@ The full plan, with the research behind it, is in `docs/plan.md` (Italian). Deci
 
 ## Architecture
 
-- `composeApp/` – the app. `commonMain` holds UI (Compose Multiplatform), domain (use cases) and data (repositories, SQLDelight cache). `androidMain` and `iosMain` hold only platform glue: entry points, encrypted credential storage, background work, widgets.
-- `ra-api/` – KMP library: Ktor client and kotlinx.serialization models for the RA Web API. No app logic. The daily contract tests live here too, so the app and the CI check use the same models.
-- `iosApp/` – Xcode project hosting the shared UI.
+- `composeApp/` – the shared app, a KMP library. `commonMain` holds UI (Compose Multiplatform), domain (use cases), data (repositories, SQLDelight cache), navigation (Navigation 3, destinations in `navigation/`) and DI (Koin, modules in `di/`). `androidMain` and `iosMain` hold only platform glue: encrypted credential storage, background work, the iOS view controller.
+- `androidApp/` – the Android application module: `Application`, `MainActivity`, manifest, widgets. AGP 9 does not allow the application plugin in a KMP module, so the Android entry point lives here and depends on `composeApp`.
+- `ra-api/` – KMP library: Ktor client and kotlinx.serialization models for the RA Web API. No app logic. Also has a plain `jvm` target for the daily contract tests, so the app and the CI check use the same models.
+- `iosApp/` – Xcode project hosting the shared UI. Its build phase runs `:composeApp:embedAndSignAppleFrameworkForXcode`.
+
+Package and application id: `net.bonysoft.bonusstage`. Versions live in `gradle/libs.versions.toml`.
+
+Every Navigation 3 destination must be registered in `navSavedStateConfiguration` (`navigation/Destinations.kt`): iOS has no reflection to save and restore the back stack.
 
 Keep platform code to what cannot be shared. Anything that can live in `commonMain` goes there; platform differences go behind `expect`/`actual` or an interface injected per platform.
 
@@ -47,4 +52,16 @@ Retro, inspired by PokeDaisy (https://github.com/lidor30/pokedaisy): pixel fonts
 
 ## Commands
 
-To be filled in once the project skeleton exists (build, test, run on Android and iOS, contract tests).
+Requires JDK 17+ (CI uses 21) and an Android SDK with `sdk.dir` in `local.properties`. iOS needs macOS with Xcode.
+
+| Task | Command |
+| --- | --- |
+| Build the Android app | `./gradlew :androidApp:assembleDebug` |
+| Install and run on a device or emulator | `./gradlew :androidApp:installDebug`, then `adb shell am start -n net.bonysoft.bonusstage/.MainActivity` |
+| Shared tests on the JVM (what CI runs on Linux) | `./gradlew :composeApp:testAndroidHostTest :ra-api:jvmTest :ra-api:testAndroidHostTest` |
+| Shared tests on the iOS simulator (macOS) | `./gradlew :composeApp:iosSimulatorArm64Test :ra-api:iosSimulatorArm64Test` |
+| Run on iOS | open `iosApp/iosApp.xcodeproj` in Xcode and run the `iosApp` scheme; set `TEAM_ID` in `iosApp/Configuration/Config.xcconfig` for a physical device |
+| Build iOS from the command line | `xcodebuild build -project iosApp/iosApp.xcodeproj -scheme iosApp -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO` |
+| Contract tests | added with the daily contract-test workflow (ADR 0003) |
+
+CI: `.github/workflows/ci.yml` builds Android and runs the JVM tests on every pull request. `.github/workflows/ios.yml` runs on macOS only when a pull request touches shared or iOS code, and on every push to `main`.
