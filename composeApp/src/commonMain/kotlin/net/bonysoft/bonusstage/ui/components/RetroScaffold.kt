@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.bonysoft.bonusstage.resources.Res
 import net.bonysoft.bonusstage.resources.back
+import net.bonysoft.bonusstage.ui.adaptive.LocalWindowLayout
 import net.bonysoft.bonusstage.ui.theme.PixelSize
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
 import org.jetbrains.compose.resources.stringResource
@@ -48,6 +49,8 @@ fun RetroScaffold(
     content: @Composable () -> Unit,
 ) {
     val colors = RetroTheme.colors
+    // Short screens get a slimmer header: the title in the menu font, less padding.
+    val compact = LocalWindowLayout.current.isCompactHeight
     Column(modifier = modifier.fillMaxSize().background(colors.background)) {
         Row(
             modifier = Modifier
@@ -58,7 +61,7 @@ fun RetroScaffold(
                     drawRect(colors.shadow, Offset(0f, size.height - p), Size(size.width, p))
                 }
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = if (compact) 0.dp else 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
@@ -66,7 +69,7 @@ fun RetroScaffold(
                 val backLabel = stringResource(Res.string.back)
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(if (compact) 40.dp else 48.dp)
                         .clickable(role = Role.Button, onClick = onBack)
                         .semantics { contentDescription = backLabel },
                     contentAlignment = Alignment.Center,
@@ -74,11 +77,11 @@ fun RetroScaffold(
                     PixelIcon(PixelIcons.Back, color = colors.accent)
                 }
             } else {
-                Box(Modifier.size(width = 8.dp, height = 48.dp))
+                Box(Modifier.size(width = 8.dp, height = if (compact) 40.dp else 48.dp))
             }
             Text(
                 text = title.uppercase(),
-                style = RetroTheme.typography.title,
+                style = if (compact) RetroTheme.typography.menu else RetroTheme.typography.title,
                 color = colors.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

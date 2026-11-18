@@ -3,11 +3,15 @@ package net.bonysoft.bonusstage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -34,7 +38,10 @@ import net.bonysoft.bonusstage.resources.tab_library
 import net.bonysoft.bonusstage.resources.tab_profile
 import net.bonysoft.bonusstage.resources.tab_recent
 import net.bonysoft.bonusstage.resources.tab_wishlist
+import net.bonysoft.bonusstage.ui.adaptive.LocalWindowLayout
+import net.bonysoft.bonusstage.ui.adaptive.ProvideWindowLayout
 import net.bonysoft.bonusstage.ui.components.PixelIcons
+import net.bonysoft.bonusstage.ui.components.RetroNavigationRail
 import net.bonysoft.bonusstage.ui.components.RetroTab
 import net.bonysoft.bonusstage.ui.components.RetroTabBar
 import net.bonysoft.bonusstage.ui.effects.ScreenEffect
@@ -60,7 +67,7 @@ fun App(
     RetroTheme {
         val session by accounts.session.collectAsStateWithLifecycle()
         val effect by settings.screenEffect.collectAsStateWithLifecycle(initialValue = ScreenEffect.Off)
-        Box(modifier.fillMaxSize().screenEffect(effect)) {
+        ProvideWindowLayout(modifier.fillMaxSize().screenEffect(effect)) {
             when (val current = session) {
                 Session.Loading -> Box(Modifier.fillMaxSize().background(RetroTheme.colors.background))
                 Session.SignedOut -> SignInRoute()
@@ -76,11 +83,21 @@ private val topLevel: List<TopLevel> = listOf(ProfileTab, LibraryTab, RecentTab,
 @Composable
 private fun SignedInApp(modifier: Modifier = Modifier) {
     val backStack = rememberNavBackStack(navSavedStateConfiguration, ProfileTab)
-    val openGame: (Long) -> Unit = { backStack.add(GameDetail(it)) }
-    Column(modifier = modifier.fillMaxSize().background(RetroTheme.colors.background)) {
+    val tabs = listOf(
+        RetroTab(stringResource(Res.string.tab_profile), PixelIcons.Profile),
+        RetroTab(stringResource(Res.string.tab_library), PixelIcons.Library),
+        RetroTab(stringResource(Res.string.tab_recent), PixelIcons.Recent),
+        RetroTab(stringResource(Res.string.tab_wishlist), PixelIcons.Wishlist),
+    )
+    val selected = topLevel.indexOf(backStack.firstOrNull()).coerceAtLeast(0)
+    val onSelect: (Int) -> Unit = { index -> backStack.selectTab(topLevel[index]) }
+    // Movable, so switching between rail and bottom bar (rotation, unfolding) keeps every screen's state.
+    val content = remember(backStack) {
+        movableContentOf { contentModifier: Modifier ->
+        val openGame: (Long) -> Unit = { backStack.add(GameDetail(it)) }
         NavDisplay(
             backStack = backStack,
-            modifier = Modifier.weight(1f).fillMaxWidth(),
+            modifier = contentModifier,
             onBack = { backStack.removeLastOrNull() },
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
@@ -96,16 +113,18 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
                 entry<GameDetail> { GameDetailRoute(gameId = it.gameId, onBack = { backStack.removeLastOrNull() }) }
             },
         )
-        RetroTabBar(
-            tabs = listOf(
-                RetroTab(stringResource(Res.string.tab_profile), PixelIcons.Profile),
-                RetroTab(stringResource(Res.string.tab_library), PixelIcons.Library),
-                RetroTab(stringResource(Res.string.tab_recent), PixelIcons.Recent),
-                RetroTab(stringResource(Res.string.tab_wishlist), PixelIcons.Wishlist),
-            ),
-            selectedIndex = topLevel.indexOf(backStack.firstOrNull()).coerceAtLeast(0),
-            onSelect = { index -> backStack.selectTab(topLevel[index]) },
-        )
+        }
+    }
+    if (LocalWindowLayout.current.useNavigationRail) {
+        Row(modifier = modifier.fillMaxSize().background(RetroTheme.colors.background)) {
+            RetroNavigationRail(tabs, selected, onSelect)
+            content(Modifier.weight(1f).fillMaxHeight())
+        }
+    } else {
+        Column(modifier = modifier.fillMaxSize().background(RetroTheme.colors.background)) {
+            content(Modifier.weight(1f).fillMaxWidth())
+            RetroTabBar(tabs, selected, onSelect)
+        }
     }
 }
 

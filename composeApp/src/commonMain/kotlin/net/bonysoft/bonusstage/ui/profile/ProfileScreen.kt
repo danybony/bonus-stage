@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -61,6 +63,7 @@ import net.bonysoft.bonusstage.resources.sign_out
 import net.bonysoft.bonusstage.resources.sign_out_text
 import net.bonysoft.bonusstage.resources.sign_out_title
 import net.bonysoft.bonusstage.resources.yes
+import net.bonysoft.bonusstage.ui.adaptive.ListColumnMinWidth
 import net.bonysoft.bonusstage.ui.common.RefreshStatus
 import net.bonysoft.bonusstage.ui.common.formatDate
 import net.bonysoft.bonusstage.ui.common.grouped
@@ -115,12 +118,15 @@ fun ProfileScreen(
     var pickEffect by rememberSaveable { mutableStateOf(false) }
     RetroScaffold(title = stringResource(Res.string.profile_title), modifier = modifier) {
         RefreshableContent(data = state.profile, status = state.status, onRefresh = onRefresh) { profile ->
-            LazyColumn(
+            // Windows flow into columns on wide screens; header and notice span them all.
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Adaptive(ListColumnMinWidth),
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
+                verticalItemSpacing = 20.dp,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                state.status.error?.let { error -> item(key = "stale") { StaleNotice(error) } }
-                item(key = "header") { ProfileHeader(profile, state.isDemo) }
+                state.status.error?.let { error -> item(key = "stale", span = StaggeredGridItemSpan.FullLine) { StaleNotice(error) } }
+                item(key = "header", span = StaggeredGridItemSpan.FullLine) { ProfileHeader(profile, state.isDemo) }
                 profile.richPresence?.let { presence -> item(key = "presence") { NowPlaying(presence) } }
                 item(key = "points") { PointsWindow(profile) }
                 profile.awards?.let { awards -> item(key = "awards") { AwardsWindow(awards) } }
