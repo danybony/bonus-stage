@@ -1,5 +1,9 @@
 package net.bonysoft.bonusstage
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -84,6 +88,8 @@ fun App(
     }
 }
 
+private const val TRANSITION_MS = 350
+
 private val topLevel: List<TopLevel> = listOf(ProfileTab, LibraryTab, RecentTab, WishlistTab)
 
 @Composable
@@ -105,6 +111,13 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
         NavDisplay(
             backStack = backStack,
             modifier = Modifier.fillMaxSize(),
+            // Lets NavDisplay drive the shared elements with the back gesture too.
+            sharedTransitionScope = this,
+            // Cross-fades everywhere, including predictive back: the default predictive pop shrinks
+            // the screen, and shared elements (tracked in full-screen coordinates) left it hollow.
+            transitionSpec = { fadeIn(tween(TRANSITION_MS)) togetherWith fadeOut(tween(TRANSITION_MS)) },
+            popTransitionSpec = { fadeIn(tween(TRANSITION_MS)) togetherWith fadeOut(tween(TRANSITION_MS)) },
+            predictivePopTransitionSpec = { fadeIn(tween(TRANSITION_MS)) togetherWith fadeOut(tween(TRANSITION_MS)) },
             onBack = { backStack.removeLastOrNull() },
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),

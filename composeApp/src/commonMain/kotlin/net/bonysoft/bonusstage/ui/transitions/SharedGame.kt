@@ -26,7 +26,7 @@ private val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransiti
 /** Makes shared element transitions available to every navigation entry inside. */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedGameTransitions(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun SharedGameTransitions(modifier: Modifier = Modifier, content: @Composable SharedTransitionScope.() -> Unit) {
     SharedTransitionLayout(modifier) {
         CompositionLocalProvider(LocalSharedTransitionScope provides this) {
             content()
