@@ -1,0 +1,24 @@
+# rcheevos rhash (MIT, git submodule in third_party/rcheevos) for iOS. The C sources are compiled
+# into the interop library by composeApp/build.gradle.kts (-Xcompile-source); this file adds a
+# small wrapper so Kotlin does not have to drive rc_hash_iterator_t itself.
+headers = rc_hash.h
+headerFilter = rc_hash.h
+package = net.bonysoft.bonusstage.rhash
+---
+/*
+ * Hashes the file at path for every console rhash considers from its name and contents.
+ * Writes up to max console ids and 32-character hashes; returns how many it wrote.
+ */
+static int bs_rhash(const char* path, int* consoles, char* hashes, int max) {
+    rc_hash_iterator_t iterator;
+    rc_hash_initialize_iterator(&iterator, path, NULL, 0);
+    int count = 0;
+    char hash[33];
+    while (count < max && rc_hash_iterate(hash, &iterator)) {
+        consoles[count] = iterator.consoles[iterator.index - 1];
+        memcpy(hashes + count * 32, hash, 32);
+        count++;
+    }
+    rc_hash_destroy_iterator(&iterator);
+    return count;
+}

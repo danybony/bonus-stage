@@ -23,6 +23,13 @@ kotlin {
         withHostTestBuilder {}
     }
 
+    // rcheevos rhash for the ROM scan; on Android it is built with CMake in androidApp.
+    val rcheevos = rootProject.file("third_party/rcheevos")
+    val rhashSources = listOf(
+        "rc_compat.c", "rhash/aes.c", "rhash/cdreader.c", "rhash/hash.c", "rhash/hash_disc.c",
+        "rhash/hash_encrypted.c", "rhash/hash_rom.c", "rhash/hash_zip.c", "rhash/md5.c",
+    ).map { rcheevos.resolve("src/$it") }
+
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
@@ -30,6 +37,13 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+        }
+        iosTarget.compilations.getByName("main").cinterops.create("rhash") {
+            includeDirs(rcheevos.resolve("include"), rcheevos.resolve("src"))
+            rhashSources.forEach { extraOpts("-Xcompile-source", it.path) }
+            extraOpts("-Xsource-compiler-option", "-I${rcheevos.resolve("include")}")
+            extraOpts("-Xsource-compiler-option", "-I${rcheevos.resolve("src")}")
+            extraOpts("-Xsource-compiler-option", "-O2")
         }
     }
 
