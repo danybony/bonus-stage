@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -32,7 +34,8 @@ fun RetroWindow(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = RetroTheme.colors
-    Box(modifier = modifier.padding(top = if (title != null) 12.dp else 0.dp)) {
+    // propagateMinConstraints: a width given to the window (fillMaxWidth) reaches the framed Column.
+    Box(modifier = modifier.padding(top = if (title != null) 12.dp else 0.dp), propagateMinConstraints = true) {
         Column(
             modifier = Modifier
                 .retroFrame(fill = colors.window, border = colors.windowBorder, highlight = colors.windowHighlight)
@@ -46,6 +49,7 @@ fun RetroWindow(
                 style = RetroTheme.typography.label,
                 color = colors.onAccent,
                 modifier = Modifier
+                    .wrapContentWidth(Alignment.Start)
                     .padding(start = 12.dp)
                     .offset(y = (-12).dp)
                     .retroFrame(fill = colors.accent, border = colors.windowBorder, highlight = null)

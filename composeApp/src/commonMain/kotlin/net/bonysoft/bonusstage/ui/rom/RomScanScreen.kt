@@ -1,5 +1,7 @@
 package net.bonysoft.bonusstage.ui.rom
 
+import net.bonysoft.bonusstage.ui.adaptive.AdaptiveList
+import net.bonysoft.bonusstage.ui.adaptive.fullLineItem
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,8 +11,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -70,8 +72,8 @@ fun RomScanScreen(
 ) {
     val colors = RetroTheme.colors
     RetroScaffold(title = stringResource(Res.string.rom_title), onBack = onBack, modifier = modifier) {
-        LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            item(key = "intro") {
+        AdaptiveList {
+            fullLineItem(key = "intro") {
                 RetroWindow(title = stringResource(Res.string.rom_intro_title), modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(Res.string.rom_intro), style = RetroTheme.typography.bodySmall, color = colors.onWindow)
                     Spacer(Modifier.height(12.dp))
@@ -91,12 +93,12 @@ fun RomScanScreen(
                 }
             }
             state.error?.let { error ->
-                item(key = "error") { Text(errorMessage(error), style = RetroTheme.typography.body, color = colors.error) }
+                fullLineItem(key = "error") { Text(errorMessage(error), style = RetroTheme.typography.body, color = colors.error) }
             }
             when (val progress = state.progress) {
                 null -> Unit
                 is ScanProgress.Done -> results(progress, onOpenGame)
-                else -> item(key = "progress") { ProgressWindow(progress) }
+                else -> fullLineItem(key = "progress") { ProgressWindow(progress) }
             }
         }
     }
@@ -118,9 +120,9 @@ private fun ProgressWindow(progress: ScanProgress) {
     }
 }
 
-private fun androidx.compose.foundation.lazy.LazyListScope.results(done: ScanProgress.Done, onOpenGame: (Long) -> Unit) {
+private fun LazyGridScope.results(done: ScanProgress.Done, onOpenGame: (Long) -> Unit) {
     val result = done.result
-    item(key = "summary") {
+    fullLineItem(key = "summary") {
         Text(
             stringResource(Res.string.rom_summary, result.scanned.grouped(), result.matched.size.grouped()),
             style = RetroTheme.typography.label,
@@ -128,13 +130,13 @@ private fun androidx.compose.foundation.lazy.LazyListScope.results(done: ScanPro
         )
     }
     if (result.matched.isNotEmpty()) {
-        item(key = "matched-header") {
+        fullLineItem(key = "matched-header") {
             Text(stringResource(Res.string.rom_with_achievements), style = RetroTheme.typography.title, color = RetroTheme.colors.progress, modifier = Modifier.padding(top = 8.dp))
         }
         items(result.matched, key = { "game-${it.game.id}" }) { MatchedRow(it, onClick = { onOpenGame(it.game.id) }) }
     }
     if (result.unknown.isNotEmpty()) {
-        item(key = "unknown-header") {
+        fullLineItem(key = "unknown-header") {
             Column(Modifier.padding(top = 8.dp)) {
                 Text("${stringResource(Res.string.rom_unknown)} ${result.unknown.size}", style = RetroTheme.typography.title, color = RetroTheme.colors.onBackgroundMuted)
                 Text(stringResource(Res.string.rom_unknown_help), style = RetroTheme.typography.bodySmall, color = RetroTheme.colors.onBackgroundMuted)

@@ -1,5 +1,7 @@
 package net.bonysoft.bonusstage.ui.recent
 
+import net.bonysoft.bonusstage.ui.adaptive.AdaptiveList
+import net.bonysoft.bonusstage.ui.adaptive.fullLineItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,8 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -95,15 +96,15 @@ fun RecentRoute(onOpenGame: (Long) -> Unit, modifier: Modifier = Modifier) {
 fun RecentScreen(state: RecentUiState, onRefresh: () -> Unit, onOpenGame: (Long) -> Unit, modifier: Modifier = Modifier) {
     RefreshableContent(data = state.days, status = state.status, onRefresh = onRefresh, modifier = modifier) { days ->
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            state.status.error?.let { error -> item(key = "stale") { StaleNotice(error) } }
+        AdaptiveList {
+            state.status.error?.let { error -> fullLineItem(key = "stale") { StaleNotice(error) } }
             if (days.isEmpty()) {
-                item(key = "empty") {
+                fullLineItem(key = "empty") {
                     Text(stringResource(Res.string.recent_empty), style = RetroTheme.typography.body, color = RetroTheme.colors.onBackground)
                 }
             }
             days.forEach { day ->
-                item(key = "day-${day.date}") { DayHeader(day.date, day.items.size, day.items.sumOf { it.points }, today) }
+                fullLineItem(key = "day-${day.date}") { DayHeader(day.date, day.items.size, day.items.sumOf { it.points }, today) }
                 items(day.items, key = { "unlock-${it.achievementId}" }) { unlock ->
                     UnlockRow(unlock, onClick = { onOpenGame(unlock.gameId) })
                 }
@@ -116,9 +117,9 @@ fun RecentScreen(state: RecentUiState, onRefresh: () -> Unit, onOpenGame: (Long)
 fun FriendsScreen(state: FriendsUiState, onRefresh: () -> Unit, onOpenGame: (Long) -> Unit, modifier: Modifier = Modifier) {
     RefreshableContent(data = state.days, status = state.status, onRefresh = onRefresh, modifier = modifier) { days ->
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            state.status.error?.let { error -> item(key = "stale") { StaleNotice(error) } }
-            item(key = "following") {
+        AdaptiveList {
+            state.status.error?.let { error -> fullLineItem(key = "stale") { StaleNotice(error) } }
+            fullLineItem(key = "following") {
                 Text(
                     stringResource(if (state.following == 0) Res.string.friends_empty else Res.string.friends_following, state.following),
                     style = RetroTheme.typography.label,
@@ -126,12 +127,12 @@ fun FriendsScreen(state: FriendsUiState, onRefresh: () -> Unit, onOpenGame: (Lon
                 )
             }
             if (days.isEmpty() && state.following > 0) {
-                item(key = "quiet") {
+                fullLineItem(key = "quiet") {
                     Text(stringResource(Res.string.friends_quiet), style = RetroTheme.typography.body, color = RetroTheme.colors.onBackground)
                 }
             }
             days.forEach { day ->
-                item(key = "day-${day.date}") { DayHeader(day.date, day.items.size, day.items.sumOf { it.points }, today) }
+                fullLineItem(key = "day-${day.date}") { DayHeader(day.date, day.items.size, day.items.sumOf { it.points }, today) }
                 items(day.items, key = { "friend-${it.friendUlid}-${it.achievementId}" }) { unlock ->
                     FriendUnlockRow(unlock, onClick = { onOpenGame(unlock.gameId) })
                 }

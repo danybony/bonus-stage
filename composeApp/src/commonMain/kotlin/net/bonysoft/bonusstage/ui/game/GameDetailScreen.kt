@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,6 +60,9 @@ import net.bonysoft.bonusstage.resources.tag_hardcore
 import net.bonysoft.bonusstage.resources.type_missable
 import net.bonysoft.bonusstage.resources.type_progression
 import net.bonysoft.bonusstage.resources.type_win_condition
+import net.bonysoft.bonusstage.ui.adaptive.AdaptiveList
+import net.bonysoft.bonusstage.ui.adaptive.LocalWindowLayout
+import net.bonysoft.bonusstage.ui.adaptive.fullLineItem
 import net.bonysoft.bonusstage.ui.common.formatDate
 import net.bonysoft.bonusstage.ui.common.formatTime
 import net.bonysoft.bonusstage.ui.common.grouped
@@ -114,11 +121,8 @@ fun GameDetailScreen(
     val title = state.game?.let { splitTitleTag(it.title).second } ?: ""
     RetroScaffold(title = title, onBack = onBack, modifier = modifier) {
         RefreshableContent(data = state.game, status = state.status, onRefresh = onRefresh) { game ->
-            LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                state.status.error?.let { error -> item(key = "stale") { StaleNotice(error) } }
-                item(key = "header") { GameHeader(game) }
-                item(key = "progress") { ProgressWindow(game, onShare = { sharing = true }) }
-                item(key = "achievements-header") {
+            val achievements: LazyGridScope.() -> Unit = {
+                fullLineItem(key = "achievements-header") {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         Text(
                             stringResource(Res.string.game_achievements),
@@ -134,7 +138,7 @@ fun GameDetailScreen(
                     }
                 }
                 if (game.achievements.isEmpty()) {
-                    item(key = "none") {
+                    fullLineItem(key = "none") {
                         Text(stringResource(Res.string.game_no_achievements), style = RetroTheme.typography.body, color = RetroTheme.colors.onBackground)
                     }
                 }
@@ -145,6 +149,27 @@ fun GameDetailScreen(
                         hidden = hidden,
                         onReveal = { revealed = revealed + achievement.id },
                     )
+                }
+            }
+            if (LocalWindowLayout.current.isExpandedWidth) {
+                // Two panes: the game on the left, its achievements on the right.
+                Row(Modifier.fillMaxSize()) {
+                    Column(
+                        modifier = Modifier.weight(0.4f).fillMaxHeight().verticalScroll(rememberScrollState()).padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        state.status.error?.let { StaleNotice(it) }
+                        GameHeader(game)
+                        ProgressWindow(game, onShare = { sharing = true })
+                    }
+                    AdaptiveList(modifier = Modifier.weight(0.6f), spacing = 16.dp, content = achievements)
+                }
+            } else {
+                AdaptiveList(spacing = 16.dp) {
+                    state.status.error?.let { error -> fullLineItem(key = "stale") { StaleNotice(error) } }
+                    fullLineItem(key = "header") { GameHeader(game) }
+                    fullLineItem(key = "progress") { ProgressWindow(game, onShare = { sharing = true }) }
+                    achievements()
                 }
             }
         }

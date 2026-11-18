@@ -1,5 +1,7 @@
 package net.bonysoft.bonusstage.ui.library
 
+import net.bonysoft.bonusstage.ui.adaptive.AdaptiveList
+import net.bonysoft.bonusstage.ui.adaptive.fullLineItem
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,8 +9,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -104,15 +106,12 @@ fun LibraryScreen(
     ) {
         RefreshableContent(data = state.allGames, status = state.status, onRefresh = onRefresh) { all ->
             val games = state.games
-            LazyColumn(
-                contentPadding = PaddingValues(vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                state.status.error?.let { error -> item(key = "stale") { StaleNotice(error, Modifier.padding(horizontal = 16.dp)) } }
-                item(key = "filters") {
+            AdaptiveList(spacing = 12.dp) {
+                state.status.error?.let { error -> fullLineItem(key = "stale") { StaleNotice(error) } }
+                fullLineItem(key = "filters") {
                     Filters(state, onSelectStatus, onOpenConsoles = { pickConsole = true })
                 }
-                item(key = "summary") {
+                fullLineItem(key = "summary") {
                     Text(
                         text = stringResource(
                             Res.string.library_summary,
@@ -122,11 +121,10 @@ fun LibraryScreen(
                         ),
                         style = RetroTheme.typography.label,
                         color = RetroTheme.colors.onBackgroundMuted,
-                        modifier = Modifier.padding(horizontal = 16.dp),
                     )
                 }
                 if (games.isEmpty()) {
-                    item(key = "empty") {
+                    fullLineItem(key = "empty") {
                         Text(
                             text = stringResource(if (all.isEmpty()) Res.string.library_empty else Res.string.library_no_match),
                             style = RetroTheme.typography.body,
@@ -136,7 +134,7 @@ fun LibraryScreen(
                     }
                 }
                 items(games, key = { it.id }) { game ->
-                    GameRow(game, onClick = { onOpenGame(game.id) }, modifier = Modifier.padding(horizontal = 16.dp))
+                    GameRow(game, onClick = { onOpenGame(game.id) })
                 }
             }
         }
@@ -163,10 +161,7 @@ private fun Filters(state: LibraryUiState, onSelectStatus: (StatusFilter) -> Uni
         StatusFilter.Mastered to stringResource(Res.string.filter_mastered),
     )
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(statusLabels, key = { it.first.name }) { (filter, label) ->
                 RetroChip(text = label, selected = state.statusFilter == filter, onClick = { onSelectStatus(filter) })
             }
@@ -176,7 +171,6 @@ private fun Filters(state: LibraryUiState, onSelectStatus: (StatusFilter) -> Uni
             text = "$consoleName ▾",
             selected = state.console != null,
             onClick = onOpenConsoles,
-            modifier = Modifier.padding(horizontal = 16.dp),
         )
     }
 }
