@@ -1,10 +1,13 @@
 package net.bonysoft.bonusstage.ui.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
@@ -34,15 +37,20 @@ fun RetroTag(text: String, color: Color, modifier: Modifier = Modifier, textColo
     )
 }
 
-/** A selectable filter chip. */
+/** A selectable filter chip, optionally with a pixel icon before the text. */
 @Composable
-fun RetroChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun RetroChip(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: PixelIcons.Icon? = null,
+) {
     val colors = RetroTheme.colors
-    Text(
-        text = text.uppercase(),
-        style = RetroTheme.typography.label,
-        color = if (selected) colors.onAccent else colors.onBackground,
-        maxLines = 1,
+    val contentColor = if (selected) colors.onAccent else colors.onBackground
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
             .heightIn(min = 40.dp)
             .semantics { this.selected = selected }
@@ -53,7 +61,10 @@ fun RetroChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: Mo
                 highlight = null,
             )
             .padding(horizontal = 12.dp, vertical = 10.dp),
-    )
+    ) {
+        if (icon != null) PixelIcon(icon, color = contentColor, size = 18.dp)
+        Text(text = text.uppercase(), style = RetroTheme.typography.label, color = contentColor, maxLines = 1)
+    }
 }
 
 fun Award.color(colors: net.bonysoft.bonusstage.ui.theme.RetroColors): Color = when (this) {

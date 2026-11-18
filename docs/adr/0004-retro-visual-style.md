@@ -9,7 +9,7 @@ The app should feel like part of the retro games it tracks. PokeDaisy (https://g
 
 ## Decision
 
-- Pixel font for the interface and a highly legible font for long text (candidates: Pixel Operator and Atkinson Hyperlegible, licenses to be verified).
+- Pixel fonts throughout: Pixel Operator for the interface, Pixelify Sans for long text. (Amended 2026-11-18: the first version paired Pixel Operator with Atkinson Hyperlegible, a non-pixel font, which clashed on screens mixing both; Pixelify Sans keeps long text readable while staying pixel. To be revisited if it reads poorly on real devices.)
 - Screens and components styled after classic game menus.
 - LCD, scanline and CRT effects after the MVP (AGSL shaders on Android, Metal on iOS).
 - No Material You.

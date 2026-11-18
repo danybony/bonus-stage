@@ -151,10 +151,9 @@
     <string name="recap_this_month">This month</string>
     <string name="recap_last_month">Last month</string>
 
-    <string name="effect_title">SCREEN EFFECT</string>
-    <string name="effect_menu">Screen effect: %1$s</string>
+    <string name="effect_title">Screen effect</string>
     <string name="effect_off">Off</string>
-    <string name="effect_lcd">LCD grid</string>
+    <string name="effect_lcd">LCD</string>
     <string name="effect_scanlines">Scanlines</string>
     <string name="effect_crt">CRT</string>
 

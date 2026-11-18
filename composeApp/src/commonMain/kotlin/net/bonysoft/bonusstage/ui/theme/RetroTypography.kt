@@ -8,15 +8,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import net.bonysoft.bonusstage.resources.Res
-import net.bonysoft.bonusstage.resources.atkinson_hyperlegible_bold
-import net.bonysoft.bonusstage.resources.atkinson_hyperlegible_regular
 import net.bonysoft.bonusstage.resources.pixel_operator
 import net.bonysoft.bonusstage.resources.pixel_operator_bold
+import net.bonysoft.bonusstage.resources.pixelify_sans_bold
+import net.bonysoft.bonusstage.resources.pixelify_sans_regular
 import org.jetbrains.compose.resources.Font
 
 /**
- * Pixel Operator for the interface (titles, menus, numbers) and Atkinson Hyperlegible for long text.
- * Pixel sizes are multiples of 4 so the 16 px pixel font stays as crisp as possible.
+ * Pixel Operator for the interface (titles, menus, numbers) and Pixelify Sans, a rounder and bolder
+ * pixel font, for long text. Pixel sizes are multiples of 4 so the 16 px pixel font stays as crisp
+ * as possible.
  */
 @Immutable
 data class RetroTypography(
@@ -37,8 +38,8 @@ fun pixelFontFamily(): FontFamily = FontFamily(
 
 @Composable
 fun readableFontFamily(): FontFamily = FontFamily(
-    Font(Res.font.atkinson_hyperlegible_regular, FontWeight.Normal),
-    Font(Res.font.atkinson_hyperlegible_bold, FontWeight.Bold),
+    Font(Res.font.pixelify_sans_regular, FontWeight.Normal),
+    Font(Res.font.pixelify_sans_bold, FontWeight.Bold),
 )
 
 @Composable
@@ -51,10 +52,13 @@ fun bonusStageTypography(): RetroTypography {
         menu = TextStyle(fontFamily = pixel, fontSize = 20.sp, lineHeight = 24.sp),
         label = TextStyle(fontFamily = pixel, fontSize = 16.sp, lineHeight = 20.sp),
         number = TextStyle(fontFamily = pixel, fontWeight = FontWeight.Bold, fontSize = 20.sp, lineHeight = 24.sp),
-        body = TextStyle(fontFamily = readable, fontSize = 16.sp, lineHeight = 22.sp),
-        bodySmall = TextStyle(fontFamily = readable, fontSize = 14.sp, lineHeight = 19.sp),
+        // Pixelify Sans draws "fi" and "ffi" as ligatures that read like other letters: off.
+        body = TextStyle(fontFamily = readable, fontSize = 16.sp, lineHeight = 22.sp, fontFeatureSettings = NO_LIGATURES),
+        bodySmall = TextStyle(fontFamily = readable, fontSize = 14.sp, lineHeight = 19.sp, fontFeatureSettings = NO_LIGATURES),
     )
 }
+
+private const val NO_LIGATURES = "liga 0, clig 0"
 
 val LocalRetroTypography = staticCompositionLocalOf<RetroTypography> {
     error("RetroTypography not provided: wrap the content in RetroTheme")

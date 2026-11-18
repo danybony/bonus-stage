@@ -134,6 +134,7 @@ fun GameDetailScreen(
                             text = stringResource(if (state.hideSpoilers) Res.string.spoilers_hidden else Res.string.spoilers_shown),
                             selected = state.hideSpoilers,
                             onClick = onToggleSpoilers,
+                            icon = if (state.hideSpoilers) PixelIcons.EyeOff else PixelIcons.Eye,
                         )
                     }
                 }
