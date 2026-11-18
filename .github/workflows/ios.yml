@@ -1,17 +1,10 @@
 name: iOS
 
-# macOS minutes cost ten times Linux ones on private repositories,
-# so pull requests run this only when they touch code that ends up in the iOS app.
+# iOS work is paused (Android first): pull requests no longer wait for macOS runners.
+# Pushes to main still build iOS, so breakage in shared code shows up. To resume, add back:
+#   pull_request:
+#     paths: ['iosApp/**', '**/commonMain/**', '**/iosMain/**', 'gradle/**', '**/*.gradle.kts', 'gradle.properties', '.github/workflows/ios.yml']
 on:
-  pull_request:
-    paths:
-      - 'iosApp/**'
-      - '**/commonMain/**'
-      - '**/iosMain/**'
-      - 'gradle/**'
-      - '**/*.gradle.kts'
-      - 'gradle.properties'
-      - '.github/workflows/ios.yml'
   push:
     branches: [main]
   workflow_dispatch:
