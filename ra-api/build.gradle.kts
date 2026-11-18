@@ -21,6 +21,19 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
+        // The live API check (ADR 0003) runs only through `contractTest`, never with the unit tests.
+        testRuns.named("test") {
+            executionTask.configure {
+                filter { excludeTestsMatching("*ApiContractTest") }
+            }
+        }
+        testRuns.create("contract") {
+            executionTask.configure {
+                filter { includeTestsMatching("*ApiContractTest") }
+                outputs.upToDateWhen { false }
+                testLogging { showStandardStreams = true }
+            }
+        }
     }
     iosArm64()
     iosSimulatorArm64()
@@ -38,6 +51,9 @@ kotlin {
         }
         jvmMain.dependencies {
             implementation(libs.ktor.client.okhttp)
+        }
+        jvmTest.dependencies {
+            implementation(libs.kotlin.test.junit)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

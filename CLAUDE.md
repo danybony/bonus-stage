@@ -62,6 +62,6 @@ Requires JDK 17+ (CI uses 21) and an Android SDK with `sdk.dir` in `local.proper
 | Shared tests on the iOS simulator (macOS) | `./gradlew :composeApp:iosSimulatorArm64Test :ra-api:iosSimulatorArm64Test` |
 | Run on iOS | open `iosApp/iosApp.xcodeproj` in Xcode and run the `iosApp` scheme; set `TEAM_ID` in `iosApp/Configuration/Config.xcconfig` for a physical device |
 | Build iOS from the command line | `xcodebuild build -project iosApp/iosApp.xcodeproj -scheme iosApp -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO` |
-| Contract tests | added with the daily contract-test workflow (ADR 0003) |
+| API contract check against the live API | `RA_USERNAME=… RA_API_KEY=… ./gradlew :ra-api:jvmContractTest` (skips without the variables; add `RA_UPDATE_SNAPSHOTS=true` to rewrite the snapshots in `ra-api/src/jvmTest/resources/contract/`) |
 
-CI: `.github/workflows/ci.yml` builds Android and runs the JVM tests on every pull request. `.github/workflows/ios.yml` runs on macOS only when a pull request touches shared or iOS code, and on every push to `main`.
+CI: `.github/workflows/ci.yml` builds Android and runs the JVM tests on every pull request. `.github/workflows/ios.yml` runs on macOS only when a pull request touches shared or iOS code, and on every push to `main`. `.github/workflows/api-contract.yml` runs the contract check daily (ADR 0003) with the `RA_USERNAME` and `RA_API_KEY` repository secrets and opens an `api` issue when it fails.
