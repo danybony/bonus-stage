@@ -1,0 +1,5 @@
+-- Version 1 to 2: device settings (spoiler filter).
+CREATE TABLE app_setting (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);

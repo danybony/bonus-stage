@@ -78,4 +78,26 @@
     <string name="award_tag_beaten">BEATEN</string>
     <string name="award_tag_beaten_softcore">BEATEN SC</string>
     <string name="close">Close</string>
+
+    <string name="game_info">INFO</string>
+    <string name="game_progress">PROGRESS</string>
+    <string name="game_achievements">ACHIEVEMENTS</string>
+    <string name="game_publisher">Publisher</string>
+    <string name="game_developer">Developer</string>
+    <string name="game_genre">Genre</string>
+    <string name="game_released">Released</string>
+    <string name="game_players">Players</string>
+    <string name="game_unlocked_count">%1$s of %2$s unlocked · %3$s hardcore</string>
+    <string name="game_points">%1$s / %2$s points</string>
+    <string name="game_no_achievements">This game has no achievements yet.</string>
+    <string name="spoilers_hidden">Spoilers hidden</string>
+    <string name="spoilers_shown">Spoilers shown</string>
+    <string name="spoiler_hidden_description">Hidden achievement. Tap to reveal.</string>
+    <string name="achievement_points">%1$s PTS</string>
+    <string name="achievement_unlocked_on">Unlocked %1$s</string>
+    <string name="achievement_rate">%1$s of players</string>
+    <string name="tag_hardcore">HC</string>
+    <string name="type_progression">PROGRESSION</string>
+    <string name="type_win_condition">WIN</string>
+    <string name="type_missable">MISSABLE</string>
 </resources>
