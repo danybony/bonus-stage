@@ -59,7 +59,7 @@ class LibraryRepository(
                     queries.insertGameIfMissing(game.gameId, game.title, game.consoleId.toLong(), game.consoleName, game.imageIcon)
                     queries.updateGame(
                         title = game.title, consoleId = game.consoleId.toLong(), consoleName = game.consoleName,
-                        imageIcon = game.imageIcon, imageBoxArt = null, publisher = null, developer = null,
+                        imageIcon = game.imageIcon, imageBoxArt = null, imageTitle = null, imageIngame = null, publisher = null, developer = null,
                         genre = null, released = null, numPlayers = null, id = game.gameId,
                     )
                     queries.upsertProgress(

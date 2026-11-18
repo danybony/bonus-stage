@@ -124,6 +124,8 @@ fun GameDetailScreen(
     // Achievements revealed one by one while spoilers are hidden; kept across rotation.
     var revealed by rememberSaveable { mutableStateOf(setOf<Long>()) }
     var sharing by rememberSaveable { mutableStateOf(false) }
+    // The picture open full screen, by its index in the game's media.
+    var viewing by rememberSaveable { mutableStateOf<Int?>(null) }
     val title = state.game?.let { splitTitleTag(it.title).second } ?: ""
     RetroScaffold(title = title, onBack = onBack, modifier = modifier) {
         RefreshableContent(data = state.game, status = state.status, onRefresh = onRefresh) { game ->
@@ -166,22 +168,30 @@ fun GameDetailScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         state.status.error?.let { StaleNotice(it) }
-                        GameHeader(game, origin)
+                        GameHeader(game, origin, onOpenHero = { viewing = 0 })
                         ProgressWindow(game, origin, onShare = { sharing = true })
+                        if (game.media.isNotEmpty()) MediaWindow(game.media, onOpen = { viewing = it })
                     }
                     AdaptiveList(modifier = Modifier.weight(0.6f), spacing = 16.dp, content = achievements)
                 }
             } else {
                 AdaptiveList(spacing = 16.dp) {
                     state.status.error?.let { error -> fullLineItem(key = "stale") { StaleNotice(error) } }
-                    fullLineItem(key = "header") { GameHeader(game, origin) }
+                    fullLineItem(key = "header") { GameHeader(game, origin, onOpenHero = { viewing = 0 }) }
                     fullLineItem(key = "progress") { ProgressWindow(game, origin, onShare = { sharing = true }) }
+                    if (game.media.isNotEmpty()) {
+                        fullLineItem(key = "media") { MediaWindow(game.media, onOpen = { viewing = it }) }
+                    }
                     achievements()
                 }
             }
         }
     }
     val game = state.game
+    val media = game?.media.orEmpty()
+    viewing?.takeIf { it in media.indices }?.let { page ->
+        MediaViewer(media, initialPage = page, onDismiss = { viewing = null })
+    }
     val award = game?.award
     if (sharing && game != null && award != null) {
         val awardLabel = when (award) {
@@ -202,10 +212,11 @@ fun GameDetailScreen(
 }
 
 @Composable
-private fun GameHeader(game: GameDetail, origin: GameOrigin) {
+private fun GameHeader(game: GameDetail, origin: GameOrigin, onOpenHero: () -> Unit) {
     val colors = RetroTheme.colors
     val (tag, title) = splitTitleTag(game.title)
     RetroWindow(title = stringResource(Res.string.game_info), modifier = Modifier.fillMaxWidth()) {
+        GameHero(game, onClick = onOpenHero, modifier = Modifier.padding(bottom = 16.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 96.dp, modifier = Modifier.sharedGame(game.id, GamePart.Icon, origin))
             Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {

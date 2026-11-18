@@ -55,7 +55,9 @@ CREATE TABLE game (
     developer TEXT,
     genre TEXT,
     released TEXT,
-    num_players INTEGER
+    num_players INTEGER,
+    image_title TEXT,
+    image_ingame TEXT
 );
 
 CREATE TABLE achievement (
@@ -239,6 +241,8 @@ UPDATE game SET
     console_name = :consoleName,
     image_icon = :imageIcon,
     image_box_art = coalesce(:imageBoxArt, image_box_art),
+    image_title = coalesce(:imageTitle, image_title),
+    image_ingame = coalesce(:imageIngame, image_ingame),
     publisher = coalesce(:publisher, publisher),
     developer = coalesce(:developer, developer),
     genre = coalesce(:genre, genre),

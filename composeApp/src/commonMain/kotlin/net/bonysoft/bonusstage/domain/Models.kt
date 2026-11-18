@@ -68,6 +68,8 @@ data class GameDetail(
     val consoleName: String,
     val iconUrl: String,
     val boxArtUrl: String?,
+    val titleScreenUrl: String?,
+    val inGameUrl: String?,
     val publisher: String?,
     val developer: String?,
     val genre: String?,
