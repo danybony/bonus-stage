@@ -38,6 +38,7 @@ import net.bonysoft.bonusstage.ui.game.GameDetailRoute
 import net.bonysoft.bonusstage.ui.library.LibraryRoute
 import net.bonysoft.bonusstage.ui.placeholder.ComingSoon
 import net.bonysoft.bonusstage.ui.profile.ProfileRoute
+import net.bonysoft.bonusstage.ui.recent.RecentRoute
 import net.bonysoft.bonusstage.ui.signin.SignInRoute
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
 import org.jetbrains.compose.resources.stringResource
@@ -74,7 +75,7 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
             entryProvider = entryProvider {
                 entry<ProfileTab> { ProfileRoute(onOpenGame = openGame) }
                 entry<LibraryTab> { LibraryRoute(onOpenGame = openGame) }
-                entry<RecentTab> { ComingSoon(stringResource(Res.string.tab_recent)) }
+                entry<RecentTab> { RecentRoute(onOpenGame = openGame) }
                 entry<WishlistTab> { ComingSoon(stringResource(Res.string.tab_wishlist)) }
                 entry<GameDetail> { GameDetailRoute(gameId = it.gameId, onBack = { backStack.removeLastOrNull() }) }
             },

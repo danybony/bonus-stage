@@ -18,6 +18,7 @@ import net.bonysoft.bonusstage.db.BonusStageDatabase
 import net.bonysoft.bonusstage.ui.game.GameDetailViewModel
 import net.bonysoft.bonusstage.ui.library.LibraryViewModel
 import net.bonysoft.bonusstage.ui.profile.ProfileViewModel
+import net.bonysoft.bonusstage.ui.recent.RecentViewModel
 import net.bonysoft.bonusstage.ui.signin.SignInViewModel
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
@@ -53,6 +54,7 @@ val uiModule = module {
     viewModelOf(::SignInViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::LibraryViewModel)
+    viewModelOf(::RecentViewModel)
     viewModel { (gameId: Long) -> GameDetailViewModel(gameId, get(), get()) }
 }
 
