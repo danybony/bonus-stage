@@ -148,4 +148,20 @@ class RepositoriesTest {
         assertTrue(library.observeLibrary().first().isEmpty())
         assertFalse(library.hasBeenFetched())
     }
+
+    @Test
+    fun friendsAreFetchedInCappedRotation() = runTest {
+        val accounts = signedInDemo()
+        val friends = FriendsRepository(database, accounts, refresher, policy.copy(friendsPerRefresh = 2), clock, Dispatchers.Unconfined)
+
+        assertEquals(2, friends.refresh(), "first refresh: capped at two of the three friends")
+        assertEquals(1, friends.refresh(), "second refresh: only the friend not fetched yet")
+        assertEquals(0, friends.refresh(), "everyone is fresh")
+        clock.now += policy.friendUnlocks
+        assertEquals(2, friends.refresh(), "stale again, still capped")
+
+        val feed = friends.observeFeed().first()
+        assertEquals(setOf("PixelPilgrim", "CartridgeKid", "SoftcoreSam"), feed.map { it.friendName }.toSet())
+        assertTrue(feed.zipWithNext().all { (a, b) -> a.unlockedAt >= b.unlockedAt })
+    }
 }

@@ -16,6 +16,7 @@ import kotlinx.serialization.json.Json
 import net.bonysoft.bonusstage.raapi.model.AchievementOfTheWeek
 import net.bonysoft.bonusstage.raapi.model.ActiveClaim
 import net.bonysoft.bonusstage.raapi.model.Console
+import net.bonysoft.bonusstage.raapi.model.FollowedUser
 import net.bonysoft.bonusstage.raapi.model.GameInfoAndUserProgress
 import net.bonysoft.bonusstage.raapi.model.GameListEntry
 import net.bonysoft.bonusstage.raapi.model.GameProgress
@@ -78,6 +79,10 @@ class RetroAchievementsClient(
             Page.serializer(WantToPlayGame.serializer()),
             "u" to user, "c" to count, "o" to offset,
         )
+
+    /** The people the owner of the web API key follows (no user parameter: it is always the key's owner). */
+    suspend fun getUsersIFollow(count: Int = 500, offset: Int = 0): Page<FollowedUser> =
+        call("API_GetUsersIFollow", Page.serializer(FollowedUser.serializer()), "c" to count, "o" to offset)
 
     suspend fun getActiveClaims(): List<ActiveClaim> =
         call("API_GetActiveClaims", ListSerializer(ActiveClaim.serializer()))

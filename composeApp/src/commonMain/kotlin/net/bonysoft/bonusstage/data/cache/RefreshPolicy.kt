@@ -23,6 +23,12 @@ data class RefreshPolicy(
     val recentAchievements: Duration = 10.minutes,
     /** Want to Play list and active claims: a few times a day. */
     val wishlist: Duration = 6.hours,
+    /** The list of people the user follows. */
+    val following: Duration = 1.days,
+    /** Each friend's recent unlocks: one API call per friend, so not more often than this. */
+    val friendUnlocks: Duration = 30.minutes,
+    /** At most this many friends are fetched per refresh; the rest wait for the next one. */
+    val friendsPerRefresh: Int = 20,
 )
 
 object Freshness {

@@ -20,17 +20,17 @@ class RecentGroupingTest {
             unlock(3, "2026-11-18T23:30:00Z"),
         )
 
-        val days = unlocks.groupByDay(TimeZone.UTC)
+        val days = unlocks.groupByDay(TimeZone.UTC) { it.unlockedAt }
 
         assertEquals(listOf(LocalDate(2026, 11, 18), LocalDate(2026, 11, 17)), days.map { it.date })
-        assertEquals(listOf(3L, 2L), days[0].unlocks.map { it.achievementId })
-        assertEquals(15, days[0].points)
+        assertEquals(listOf(3L, 2L), days[0].items.map { it.achievementId })
+        assertEquals(15, days[0].items.sumOf { it.points })
     }
 
     @Test
     fun usesTheDeviceTimeZone() {
         // 23:30 UTC is already the next day in Rome.
-        val days = listOf(unlock(1, "2026-11-18T23:30:00Z")).groupByDay(TimeZone.of("Europe/Rome"))
+        val days = listOf(unlock(1, "2026-11-18T23:30:00Z")).groupByDay(TimeZone.of("Europe/Rome")) { it.unlockedAt }
 
         assertEquals(LocalDate(2026, 11, 19), days.single().date)
     }

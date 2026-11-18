@@ -49,3 +49,14 @@ data class RecentlyPlayedGame(
     @SerialName("LastPlayed") val lastPlayed: String,
     @SerialName("AchievementsTotal") val achievementsTotal: Int = 0,
 )
+
+/** One entry of `API_GetUsersIFollow`: someone the key's owner follows. */
+@Serializable
+data class FollowedUser(
+    @SerialName("User") val user: String,
+    @SerialName("ULID") val ulid: String,
+    @SerialName("Points") val points: Long,
+    @SerialName("PointsSoftcore") val pointsSoftcore: Long = 0,
+    @Serializable(with = net.bonysoft.bonusstage.raapi.internal.FlexibleBooleanSerializer::class)
+    @SerialName("IsFollowingMe") val isFollowingMe: Boolean = false,
+)

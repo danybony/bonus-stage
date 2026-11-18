@@ -231,6 +231,39 @@ object DemoData {
 
     fun wantToPlay() = Page(count = wishlist.size, total = wishlist.size, results = wishlist)
 
+    /** Made-up people the demo user follows; each unlocked a few achievements of the demo games. */
+    private class DemoFriend(val name: String, val ulid: String, val points: Long, val unlocks: List<Triple<Int, Int, Duration>>)
+
+    private val friends = listOf(
+        DemoFriend("PixelPilgrim", "00000000000000000000FRIEND1", 12_480, listOf(Triple(1, 4, 25.minutes), Triple(1, 7, 3.hours), Triple(3, 6, 1.days))),
+        DemoFriend("CartridgeKid", "00000000000000000000FRIEND2", 3_215, listOf(Triple(0, 2, 2.hours), Triple(0, 6, 2.hours), Triple(4, 2, 2.days))),
+        DemoFriend("SoftcoreSam", "00000000000000000000FRIEND3", 870, listOf(Triple(2, 5, 50.minutes))),
+    )
+
+    fun following() = Page(
+        count = friends.size,
+        total = friends.size,
+        results = friends.mapIndexed { index, friend ->
+            net.bonysoft.bonusstage.raapi.model.FollowedUser(friend.name, friend.ulid, friend.points, 0, isFollowingMe = index != 2)
+        },
+    )
+
+    /** Recent unlocks of the demo user, or of a demo friend when [user] is one of their ULIDs. */
+    fun recentAchievementsOf(user: String?, minutes: Int): List<RecentAchievement> {
+        val friend = friends.firstOrNull { it.ulid == user } ?: return recentAchievements(minutes)
+        return friend.unlocks.filter { it.third <= minutes.minutes }.map { (gameIndex, achievementIndex, ago) ->
+            val game = games[gameIndex]
+            val achievement = game.achievements[achievementIndex]
+            RecentAchievement(
+                date = format(now() - ago), hardcoreMode = gameIndex != 2, achievementId = game.id * 100 + achievementIndex,
+                title = achievement.title, description = achievement.description,
+                badgeName = (game.firstBadge + achievementIndex).toString(), points = achievement.points,
+                trueRatio = achievement.points * 3, type = achievement.type, gameTitle = game.title,
+                gameIcon = game.icon, gameId = game.id, consoleName = game.consoleName,
+            )
+        }
+    }
+
     fun activeClaims() = listOf(
         ActiveClaim(
             id = 11246, user = "DemoDev", gameId = 26971, gameTitle = "~Homebrew~ No Place To Hide",

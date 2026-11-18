@@ -2,15 +2,13 @@ package net.bonysoft.bonusstage.ui.recent
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import net.bonysoft.bonusstage.domain.RecentUnlock
 import net.bonysoft.bonusstage.ui.common.localDate
+import kotlin.time.Instant
 
-data class UnlockDay(val date: LocalDate, val unlocks: List<RecentUnlock>) {
-    val points: Int get() = unlocks.sumOf { it.points }
-}
+data class Day<T>(val date: LocalDate, val items: List<T>)
 
-/** Groups unlocks by local calendar day, newest day first and newest unlock first within a day. */
-fun List<RecentUnlock>.groupByDay(timeZone: TimeZone): List<UnlockDay> =
-    sortedByDescending { it.unlockedAt }
-        .groupBy { it.unlockedAt.localDate(timeZone) }
-        .map { (date, unlocks) -> UnlockDay(date, unlocks) }
+/** Groups items by local calendar day, newest day first and newest item first within a day. */
+fun <T> List<T>.groupByDay(timeZone: TimeZone, at: (T) -> Instant): List<Day<T>> =
+    sortedByDescending(at)
+        .groupBy { at(it).localDate(timeZone) }
+        .map { (date, items) -> Day(date, items) }
