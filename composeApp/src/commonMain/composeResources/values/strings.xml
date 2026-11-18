@@ -100,4 +100,10 @@
     <string name="type_progression">PROGRESSION</string>
     <string name="type_win_condition">WIN</string>
     <string name="type_missable">MISSABLE</string>
+
+    <string name="recent_title">Recent</string>
+    <string name="recent_today">TODAY</string>
+    <string name="recent_yesterday">YESTERDAY</string>
+    <string name="recent_day_summary">%1$s unlocks · %2$s pts</string>
+    <string name="recent_empty">No achievements in the last two weeks. Time to play!</string>
 </resources>
