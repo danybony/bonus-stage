@@ -64,6 +64,7 @@ import net.bonysoft.bonusstage.ui.components.RetroBadge
 import net.bonysoft.bonusstage.ui.components.RetroDialog
 import net.bonysoft.bonusstage.ui.components.RetroMenuItem
 import net.bonysoft.bonusstage.ui.components.RetroScaffold
+import net.bonysoft.bonusstage.ui.components.RetroTag
 import net.bonysoft.bonusstage.ui.components.RetroWindow
 import net.bonysoft.bonusstage.ui.components.StaleNotice
 import net.bonysoft.bonusstage.ui.components.retroFrame
@@ -139,7 +140,7 @@ private fun ProfileHeader(profile: Profile, isDemo: Boolean) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(profile.username, style = RetroTheme.typography.title, color = colors.onWindow, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    if (isDemo) Tag(stringResource(Res.string.demo_badge), colors.softcore)
+                    if (isDemo) RetroTag(stringResource(Res.string.demo_badge), colors.softcore)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     val online = profile.isOnline
@@ -242,18 +243,6 @@ private fun RecentlyPlayedWindow(games: List<RecentlyPlayedGame>, onOpenGame: (L
             )
         }
     }
-}
-
-@Composable
-internal fun Tag(text: String, color: Color, modifier: Modifier = Modifier) {
-    Text(
-        text = text,
-        style = RetroTheme.typography.label,
-        color = RetroTheme.colors.windowHighlight,
-        modifier = modifier
-            .retroFrame(fill = color, border = RetroTheme.colors.windowBorder, highlight = null)
-            .padding(horizontal = 6.dp, vertical = 1.dp),
-    )
 }
 
 @Preview

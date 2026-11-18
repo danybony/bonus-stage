@@ -14,6 +14,7 @@ import net.bonysoft.bonusstage.data.repository.ProfileRepository
 import net.bonysoft.bonusstage.data.repository.RecentAchievementsRepository
 import net.bonysoft.bonusstage.data.repository.WishlistRepository
 import net.bonysoft.bonusstage.db.BonusStageDatabase
+import net.bonysoft.bonusstage.ui.library.LibraryViewModel
 import net.bonysoft.bonusstage.ui.profile.ProfileViewModel
 import net.bonysoft.bonusstage.ui.signin.SignInViewModel
 import org.koin.core.KoinApplication
@@ -47,6 +48,7 @@ val dataModule = module {
 val uiModule = module {
     viewModelOf(::SignInViewModel)
     viewModelOf(::ProfileViewModel)
+    viewModelOf(::LibraryViewModel)
 }
 
 val appModules = listOf(platformModule, dataModule, uiModule)

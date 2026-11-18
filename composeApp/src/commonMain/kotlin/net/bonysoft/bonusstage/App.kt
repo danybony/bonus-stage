@@ -34,6 +34,7 @@ import net.bonysoft.bonusstage.resources.tab_wishlist
 import net.bonysoft.bonusstage.ui.components.PixelIcons
 import net.bonysoft.bonusstage.ui.components.RetroTab
 import net.bonysoft.bonusstage.ui.components.RetroTabBar
+import net.bonysoft.bonusstage.ui.library.LibraryRoute
 import net.bonysoft.bonusstage.ui.placeholder.ComingSoon
 import net.bonysoft.bonusstage.ui.profile.ProfileRoute
 import net.bonysoft.bonusstage.ui.signin.SignInRoute
@@ -71,7 +72,7 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
             ),
             entryProvider = entryProvider {
                 entry<ProfileTab> { ProfileRoute(onOpenGame = openGame) }
-                entry<LibraryTab> { ComingSoon(stringResource(Res.string.tab_library)) }
+                entry<LibraryTab> { LibraryRoute(onOpenGame = openGame) }
                 entry<RecentTab> { ComingSoon(stringResource(Res.string.tab_recent)) }
                 entry<WishlistTab> { ComingSoon(stringResource(Res.string.tab_wishlist)) }
                 entry<GameDetail> { ComingSoon("Game ${it.gameId}", onBack = { backStack.removeLastOrNull() }) }

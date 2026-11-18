@@ -60,4 +60,22 @@
     <string name="award_events">Events</string>
     <string name="profile_recently_played">RECENTLY PLAYED</string>
     <string name="profile_options">OPTIONS</string>
+
+    <string name="library_title">Library</string>
+    <string name="filter_all">All</string>
+    <string name="filter_in_progress">Playing</string>
+    <string name="filter_beaten">Beaten</string>
+    <string name="filter_mastered">Mastered</string>
+    <string name="filter_all_consoles">All consoles</string>
+    <string name="filter_console_title">CONSOLE</string>
+    <string name="library_summary">%1$s games · %2$s beaten · %3$s mastered</string>
+    <string name="library_empty">No games yet. Play something with RetroAchievements and it will show up here.</string>
+    <string name="library_no_match">No games match these filters.</string>
+    <string name="progress_count">%1$s / %2$s · %3$s</string>
+    <string name="no_achievements">No achievements</string>
+    <string name="award_tag_mastered">MASTERED</string>
+    <string name="award_tag_completed">COMPLETED</string>
+    <string name="award_tag_beaten">BEATEN</string>
+    <string name="award_tag_beaten_softcore">BEATEN SC</string>
+    <string name="close">Close</string>
 </resources>
