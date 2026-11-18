@@ -2,6 +2,11 @@ package net.bonysoft.bonusstage
 
 import net.bonysoft.bonusstage.data.account.AccountRepository
 import net.bonysoft.bonusstage.data.account.CredentialStore
+import net.bonysoft.bonusstage.data.alerts.AlertNotifier
+import net.bonysoft.bonusstage.data.alerts.BackgroundChecks
+import net.bonysoft.bonusstage.data.alerts.WishlistAlertChecker
+import net.bonysoft.bonusstage.data.createTestDatabase
+import net.bonysoft.bonusstage.db.BonusStageDatabase
 import net.bonysoft.bonusstage.di.dataModule
 import net.bonysoft.bonusstage.di.uiModule
 import org.koin.dsl.koinApplication
@@ -19,13 +24,22 @@ class KoinModulesTest {
                 override suspend fun clear() = Unit
             }
         }
+        single<AlertNotifier> { AlertNotifier { } }
+        single<BackgroundChecks> {
+            object : BackgroundChecks {
+                override fun schedule() = Unit
+                override fun cancel() = Unit
+            }
+        }
+        single<BonusStageDatabase> { createTestDatabase() }
     }
 
     @Test
     fun dataModulesResolve() {
-        val koin = koinApplication { modules(fakePlatform, dataModule, uiModule) }.koin
+        val koin = koinApplication { allowOverride(true); modules(dataModule, uiModule, fakePlatform) }.koin
 
         assertNotNull(koin.get<AccountRepository>())
+        assertNotNull(koin.get<WishlistAlertChecker>())
         koin.close()
     }
 }

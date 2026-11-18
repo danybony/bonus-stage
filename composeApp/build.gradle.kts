@@ -62,6 +62,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.koin.android)
             implementation(libs.sqldelight.android.driver)
+            implementation(libs.androidx.work.runtime)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.activity.compose)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)

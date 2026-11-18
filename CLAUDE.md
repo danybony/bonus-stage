@@ -61,6 +61,7 @@ Requires JDK 17+ (CI uses 21) and an Android SDK with `sdk.dir` in `local.proper
 | Task | Command |
 | --- | --- |
 | Build the Android app | `./gradlew :androidApp:assembleDebug` |
+| Run the wishlist set check now (debug build) | `adb shell am broadcast -a net.bonysoft.bonusstage.debug.CHECK_WISHLIST -p net.bonysoft.bonusstage` |
 | Install and run on a device or emulator | `./gradlew :androidApp:installDebug`, then `adb shell am start -n net.bonysoft.bonusstage/.MainActivity` |
 | Shared tests on the JVM (what CI runs on Linux) | `./gradlew :composeApp:testAndroidHostTest :ra-api:jvmTest :ra-api:testAndroidHostTest` |
 | Shared tests on the iOS simulator (macOS) | `./gradlew :composeApp:iosSimulatorArm64Test :ra-api:iosSimulatorArm64Test` |

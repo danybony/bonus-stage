@@ -39,4 +39,5 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(project.dependencies.platform(libs.koin.bom))
     implementation(libs.koin.android)
+    debugImplementation(libs.androidx.work.runtime)
 }

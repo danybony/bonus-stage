@@ -36,11 +36,11 @@ import net.bonysoft.bonusstage.ui.components.RetroTab
 import net.bonysoft.bonusstage.ui.components.RetroTabBar
 import net.bonysoft.bonusstage.ui.game.GameDetailRoute
 import net.bonysoft.bonusstage.ui.library.LibraryRoute
-import net.bonysoft.bonusstage.ui.placeholder.ComingSoon
 import net.bonysoft.bonusstage.ui.profile.ProfileRoute
 import net.bonysoft.bonusstage.ui.recent.RecentRoute
 import net.bonysoft.bonusstage.ui.signin.SignInRoute
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
+import net.bonysoft.bonusstage.ui.wishlist.WishlistRoute
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -76,7 +76,7 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
                 entry<ProfileTab> { ProfileRoute(onOpenGame = openGame) }
                 entry<LibraryTab> { LibraryRoute(onOpenGame = openGame) }
                 entry<RecentTab> { RecentRoute(onOpenGame = openGame) }
-                entry<WishlistTab> { ComingSoon(stringResource(Res.string.tab_wishlist)) }
+                entry<WishlistTab> { WishlistRoute(onOpenGame = openGame) }
                 entry<GameDetail> { GameDetailRoute(gameId = it.gameId, onBack = { backStack.removeLastOrNull() }) }
             },
         )
