@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.bonysoft.bonusstage.domain.AwardCounts
 import net.bonysoft.bonusstage.domain.Profile
@@ -54,7 +53,6 @@ import net.bonysoft.bonusstage.resources.profile_true_points
 import net.bonysoft.bonusstage.resources.profile_unranked
 import net.bonysoft.bonusstage.resources.effect_crt
 import net.bonysoft.bonusstage.resources.effect_lcd
-import net.bonysoft.bonusstage.resources.effect_menu
 import net.bonysoft.bonusstage.resources.effect_off
 import net.bonysoft.bonusstage.resources.effect_scanlines
 import net.bonysoft.bonusstage.resources.effect_title
@@ -78,6 +76,7 @@ import net.bonysoft.bonusstage.ui.components.RetroScaffold
 import net.bonysoft.bonusstage.ui.components.RetroTag
 import net.bonysoft.bonusstage.ui.components.RetroWindow
 import net.bonysoft.bonusstage.ui.effects.ScreenEffect
+import net.bonysoft.bonusstage.ui.effects.ScreenEffectPicker
 import net.bonysoft.bonusstage.ui.components.StaleNotice
 import net.bonysoft.bonusstage.ui.components.retroFrame
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
@@ -115,7 +114,6 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
 ) {
     var confirmSignOut by rememberSaveable { mutableStateOf(false) }
-    var pickEffect by rememberSaveable { mutableStateOf(false) }
     RetroScaffold(title = stringResource(Res.string.profile_title), modifier = modifier) {
         RefreshableContent(data = state.profile, status = state.status, onRefresh = onRefresh) { profile ->
             // Windows flow into columns on wide screens; header and notice span them all.
@@ -136,28 +134,20 @@ fun ProfileScreen(
                 item(key = "options") {
                     RetroWindow(title = stringResource(Res.string.profile_options), modifier = Modifier.fillMaxWidth()) {
                         RetroMenuItem(text = stringResource(Res.string.recap_title), onClick = onOpenRecap)
-                        RetroMenuItem(
-                            text = stringResource(Res.string.effect_menu, effectLabel(state.screenEffect)),
-                            onClick = { pickEffect = true },
+                        Text(
+                            stringResource(Res.string.effect_title),
+                            style = RetroTheme.typography.menu,
+                            color = RetroTheme.colors.onWindow,
+                            modifier = Modifier.padding(start = 22.dp, top = 6.dp, bottom = 8.dp),
+                        )
+                        ScreenEffectPicker(
+                            selected = state.screenEffect,
+                            labels = ScreenEffect.entries.associateWith { effectLabel(it) },
+                            onSelect = onSelectEffect,
+                            modifier = Modifier.padding(start = 22.dp, bottom = 8.dp),
                         )
                         RetroMenuItem(text = stringResource(Res.string.sign_out), onClick = { confirmSignOut = true })
                     }
-                }
-            }
-        }
-    }
-    if (pickEffect) {
-        Dialog(onDismissRequest = { pickEffect = false }) {
-            RetroWindow(title = stringResource(Res.string.effect_title)) {
-                ScreenEffect.entries.forEach { effect ->
-                    RetroMenuItem(
-                        text = effectLabel(effect),
-                        selected = effect == state.screenEffect,
-                        onClick = {
-                            onSelectEffect(effect)
-                            pickEffect = false
-                        },
-                    )
                 }
             }
         }
