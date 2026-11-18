@@ -1,6 +1,9 @@
 package net.bonysoft.bonusstage.ui.signin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +26,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,6 +54,8 @@ import net.bonysoft.bonusstage.resources.sign_in_title
 import net.bonysoft.bonusstage.resources.sign_in_unofficial
 import net.bonysoft.bonusstage.resources.sign_in_username
 import net.bonysoft.bonusstage.ui.common.errorMessage
+import net.bonysoft.bonusstage.ui.components.PixelIcon
+import net.bonysoft.bonusstage.ui.components.PixelIcons
 import net.bonysoft.bonusstage.ui.components.RetroButton
 import net.bonysoft.bonusstage.ui.components.RetroButtonStyle
 import net.bonysoft.bonusstage.ui.components.RetroMenuItem
@@ -134,10 +142,21 @@ fun SignInScreen(
                         imeAction = ImeAction.Go,
                     ),
                     keyboardActions = KeyboardActions(onGo = { onSignIn() }),
-                )
-                RetroMenuItem(
-                    text = stringResource(if (showKey) Res.string.sign_in_hide_key else Res.string.sign_in_show_key),
-                    onClick = { showKey = !showKey },
+                    trailing = {
+                        val label = stringResource(if (showKey) Res.string.sign_in_hide_key else Res.string.sign_in_show_key)
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clickable(role = Role.Button, onClick = { showKey = !showKey })
+                                .semantics { contentDescription = label },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            PixelIcon(
+                                icon = if (showKey) PixelIcons.EyeOff else PixelIcons.Eye,
+                                color = RetroTheme.colors.onWindow,
+                            )
+                        }
+                    },
                 )
                 Text(stringResource(Res.string.sign_in_key_help), style = RetroTheme.typography.bodySmall, color = colors.onWindowMuted)
                 RetroMenuItem(
