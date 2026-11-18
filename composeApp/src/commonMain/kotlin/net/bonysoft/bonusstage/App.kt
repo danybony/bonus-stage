@@ -71,6 +71,8 @@ import org.koin.compose.koinInject
 @Composable
 fun App(
     modifier: Modifier = Modifier,
+    // Where a signed-in session opens; the platform can override it (iOS screenshots in CI).
+    startAt: List<NavKey> = listOf(ProfileTab),
     accounts: AccountRepository = koinInject(),
     settings: SettingsRepository = koinInject(),
 ) {
@@ -82,7 +84,7 @@ fun App(
                 Session.Loading -> Box(Modifier.fillMaxSize().background(RetroTheme.colors.background))
                 Session.SignedOut -> SignInRoute()
                 // A new back stack per account, so nothing of the previous user survives a sign-out.
-                is Session.SignedIn -> key(current.account.ulid) { SignedInApp() }
+                is Session.SignedIn -> key(current.account.ulid) { SignedInApp(startAt) }
             }
         }
     }
@@ -93,8 +95,8 @@ private const val TRANSITION_MS = 350
 private val topLevel: List<TopLevel> = listOf(ProfileTab, LibraryTab, RecentTab, WishlistTab)
 
 @Composable
-private fun SignedInApp(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(navSavedStateConfiguration, ProfileTab)
+private fun SignedInApp(startAt: List<NavKey>, modifier: Modifier = Modifier) {
+    val backStack = rememberNavBackStack(navSavedStateConfiguration, *startAt.toTypedArray())
     val tabs = listOf(
         RetroTab(stringResource(Res.string.tab_profile), PixelIcons.Profile),
         RetroTab(stringResource(Res.string.tab_library), PixelIcons.Library),

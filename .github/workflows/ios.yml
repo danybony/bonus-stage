@@ -1,10 +1,8 @@
 name: iOS
 
-# iOS work is paused (Android first): pull requests no longer wait for macOS runners.
-# Pushes to main still build iOS, so breakage in shared code shows up. To resume, add back:
-#   pull_request:
-#     paths: ['iosApp/**', '**/commonMain/**', '**/iosMain/**', 'gradle/**', '**/*.gradle.kts', 'gradle.properties', '.github/workflows/ios.yml']
 on:
+  pull_request:
+    paths: ['iosApp/**', '**/commonMain/**', '**/iosMain/**', 'gradle/**', '**/*.gradle.kts', 'gradle.properties', '.github/workflows/ios.yml']
   push:
     branches: [main]
   workflow_dispatch:
@@ -34,4 +32,28 @@ jobs:
           -scheme iosApp
           -configuration Debug
           -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath build/ios
           CODE_SIGNING_ALLOWED=NO
+      # No UI tests: the app opens a demo screen from a launch argument (ScreenshotMode.kt).
+      - name: Screenshots on the simulator
+        run: |
+          device=$(xcrun simctl list devices available -j | jq -r '[.devices[][] | select(.name | startswith("iPhone"))][0].udid')
+          xcrun simctl boot "$device"
+          xcrun simctl bootstatus "$device"
+          xcrun simctl install "$device" "build/ios/Build/Products/Debug-iphonesimulator/Bonus Stage.app"
+          mkdir -p screenshots
+          xcrun simctl launch "$device" net.bonysoft.bonusstage
+          sleep 20
+          xcrun simctl io "$device" screenshot screenshots/0-sign-in.png
+          for screen in profile library recent wishlist game; do
+            xcrun simctl terminate "$device" net.bonysoft.bonusstage || true
+            xcrun simctl launch "$device" net.bonysoft.bonusstage -screenshot "$screen"
+            sleep 15
+            xcrun simctl io "$device" screenshot "screenshots/$screen.png"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-screenshots
+          path: screenshots/
+          if-no-files-found: ignore
