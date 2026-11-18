@@ -64,7 +64,7 @@ class ApiContractTest {
         Check("user-awards", "API_GetUserAwards", UserAwards.serializer()) { arrayOf("u" to it) },
         Check("console-ids", "API_GetConsoleIDs", ListSerializer(Console.serializer())) { arrayOf("a" to 1, "g" to 1) },
         Check("game-list", "API_GetGameList", ListSerializer(GameListEntry.serializer())) {
-            arrayOf("i" to REFERENCE_CONSOLE_ID, "f" to 1)
+            arrayOf("i" to REFERENCE_CONSOLE_ID, "f" to 1, "h" to 1)
         },
         Check("achievement-of-the-week", "API_GetAchievementOfTheWeek", AchievementOfTheWeek.serializer()) { emptyArray() },
     )

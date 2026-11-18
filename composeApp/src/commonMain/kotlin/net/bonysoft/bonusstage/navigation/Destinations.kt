@@ -28,6 +28,9 @@ data class GameDetail(val gameId: Long) : NavKey
 @Serializable
 data object Recap : NavKey
 
+@Serializable
+data object RomScan : NavKey
+
 /**
  * iOS has no reflection, so every destination must be registered here to be saved and restored.
  */
@@ -40,6 +43,7 @@ val navSavedStateConfiguration = SavedStateConfiguration {
             subclass(WishlistTab::class, WishlistTab.serializer())
             subclass(GameDetail::class, GameDetail.serializer())
             subclass(Recap::class, Recap.serializer())
+            subclass(RomScan::class, RomScan.serializer())
         }
     }
 }

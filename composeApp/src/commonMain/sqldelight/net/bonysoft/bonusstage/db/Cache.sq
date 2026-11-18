@@ -160,6 +160,25 @@ CREATE TABLE friend_unlock (
     PRIMARY KEY (owner_ulid, friend_ulid, achievement_id)
 );
 
+-- The RA catalog per console with supported ROM hashes (ROM scans). Not user data, but kept here
+-- so a sign-out leaves nothing behind.
+CREATE TABLE catalog_game (
+    id INTEGER NOT NULL PRIMARY KEY,
+    console_id INTEGER NOT NULL,
+    console_name TEXT NOT NULL,
+    title TEXT NOT NULL,
+    image_icon TEXT NOT NULL,
+    num_achievements INTEGER NOT NULL,
+    points INTEGER NOT NULL
+);
+
+CREATE TABLE catalog_hash (
+    hash TEXT NOT NULL,
+    console_id INTEGER NOT NULL,
+    game_id INTEGER NOT NULL,
+    PRIMARY KEY (hash, game_id)
+);
+
 -- sync_state
 fetchedAt:
 SELECT fetched_at FROM sync_state WHERE resource = ?;
@@ -303,8 +322,27 @@ WHERE u.owner_ulid = ?
 ORDER BY u.unlocked_at DESC
 LIMIT :limit;
 
+-- catalog
+deleteCatalogForConsole {
+    DELETE FROM catalog_hash WHERE console_id = :consoleId;
+    DELETE FROM catalog_game WHERE console_id = :consoleId;
+}
+
+insertCatalogGame:
+INSERT OR REPLACE INTO catalog_game VALUES ?;
+
+insertCatalogHash:
+INSERT OR REPLACE INTO catalog_hash VALUES ?;
+
+catalogMatches:
+SELECT h.hash, g.*
+FROM catalog_hash h JOIN catalog_game g ON g.id = h.game_id
+WHERE h.console_id = :consoleId AND h.hash IN :hashes;
+
 -- sign-out
 clearAll {
+    DELETE FROM catalog_game;
+    DELETE FROM catalog_hash;
     DELETE FROM followed_user;
     DELETE FROM friend_unlock;
     DELETE FROM sync_state;

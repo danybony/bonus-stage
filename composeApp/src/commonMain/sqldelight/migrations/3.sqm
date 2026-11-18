@@ -1,0 +1,17 @@
+-- Version 3 to 4: RA catalog with ROM hashes, for ROM scans.
+CREATE TABLE catalog_game (
+    id INTEGER NOT NULL PRIMARY KEY,
+    console_id INTEGER NOT NULL,
+    console_name TEXT NOT NULL,
+    title TEXT NOT NULL,
+    image_icon TEXT NOT NULL,
+    num_achievements INTEGER NOT NULL,
+    points INTEGER NOT NULL
+);
+
+CREATE TABLE catalog_hash (
+    hash TEXT NOT NULL,
+    console_id INTEGER NOT NULL,
+    game_id INTEGER NOT NULL,
+    PRIMARY KEY (hash, game_id)
+);
