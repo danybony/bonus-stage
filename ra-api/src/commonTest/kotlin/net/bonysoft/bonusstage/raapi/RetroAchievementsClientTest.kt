@@ -109,8 +109,9 @@ class RetroAchievementsClientTest {
         assertTrue(consoles[0].active)
         assertFalse(consoles[1].isGameSystem)
         assertEquals("1", lastParams()["a"])
-        assertEquals(2, client(body = Fixtures.GAME_LIST).getGameList(1).single().hashes.size)
+        assertEquals(2, client(body = Fixtures.GAME_LIST).getGameList(1, withHashes = true).single().hashes.size)
         assertEquals("1", lastParams()["i"])
+        assertEquals("1", lastParams()["h"])
         assertEquals(268, client(body = Fixtures.ACHIEVEMENT_OF_THE_WEEK).getAchievementOfTheWeek().unlocksHardcoreCount)
     }
 

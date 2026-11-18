@@ -292,6 +292,14 @@ object DemoData {
         },
     )
 
+    /** The demo catalog of a console: the demo games, without ROM hashes. */
+    fun gameList(consoleId: Int) = games.filter { it.consoleId == consoleId }.map { game ->
+        net.bonysoft.bonusstage.raapi.model.GameListEntry(
+            id = game.id, title = game.title, consoleId = game.consoleId, consoleName = game.consoleName,
+            imageIcon = game.icon, numAchievements = game.achievements.size, points = game.achievements.sumOf { it.points },
+        )
+    }
+
     fun consoles() = games.distinctBy { it.consoleId }.map {
         Console(it.consoleId, it.consoleName, "https://static.retroachievements.org/assets/images/system/unknown.png", active = true, isGameSystem = true)
     }

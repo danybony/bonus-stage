@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import net.bonysoft.bonusstage.data.rom.rememberRomFolderPicker
 import net.bonysoft.bonusstage.domain.Award
 import net.bonysoft.bonusstage.domain.LibraryGame
 import net.bonysoft.bonusstage.resources.Res
@@ -41,6 +42,7 @@ import net.bonysoft.bonusstage.resources.library_summary
 import net.bonysoft.bonusstage.resources.library_title
 import net.bonysoft.bonusstage.resources.no_achievements
 import net.bonysoft.bonusstage.resources.progress_count
+import net.bonysoft.bonusstage.resources.rom_scan
 import net.bonysoft.bonusstage.ui.common.grouped
 import net.bonysoft.bonusstage.ui.common.splitTitleTag
 import net.bonysoft.bonusstage.ui.components.AwardTag
@@ -63,7 +65,12 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun LibraryRoute(onOpenGame: (Long) -> Unit, modifier: Modifier = Modifier, viewModel: LibraryViewModel = koinViewModel()) {
+fun LibraryRoute(
+    onOpenGame: (Long) -> Unit,
+    onScanRoms: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: LibraryViewModel = koinViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LibraryScreen(
         state = state,
@@ -71,6 +78,8 @@ fun LibraryRoute(onOpenGame: (Long) -> Unit, modifier: Modifier = Modifier, view
         onSelectConsole = viewModel::selectConsole,
         onSelectStatus = viewModel::selectStatus,
         onOpenGame = onOpenGame,
+        // Only where ROM folders can be picked (Android for now).
+        onScanRoms = onScanRoms.takeIf { rememberRomFolderPicker {} != null },
         modifier = modifier,
     )
 }
@@ -82,10 +91,17 @@ fun LibraryScreen(
     onSelectConsole: (Int?) -> Unit,
     onSelectStatus: (StatusFilter) -> Unit,
     onOpenGame: (Long) -> Unit,
+    onScanRoms: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     var pickConsole by rememberSaveable { mutableStateOf(false) }
-    RetroScaffold(title = stringResource(Res.string.library_title), modifier = modifier) {
+    RetroScaffold(
+        title = stringResource(Res.string.library_title),
+        modifier = modifier,
+        actions = {
+            if (onScanRoms != null) RetroChip(text = stringResource(Res.string.rom_scan), selected = false, onClick = onScanRoms)
+        },
+    ) {
         RefreshableContent(data = state.allGames, status = state.status, onRefresh = onRefresh) { all ->
             val games = state.games
             LazyColumn(

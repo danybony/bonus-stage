@@ -25,6 +25,7 @@ import net.bonysoft.bonusstage.navigation.LibraryTab
 import net.bonysoft.bonusstage.navigation.ProfileTab
 import net.bonysoft.bonusstage.navigation.Recap
 import net.bonysoft.bonusstage.navigation.RecentTab
+import net.bonysoft.bonusstage.navigation.RomScan
 import net.bonysoft.bonusstage.navigation.TopLevel
 import net.bonysoft.bonusstage.navigation.WishlistTab
 import net.bonysoft.bonusstage.navigation.navSavedStateConfiguration
@@ -42,6 +43,7 @@ import net.bonysoft.bonusstage.ui.game.GameDetailRoute
 import net.bonysoft.bonusstage.ui.library.LibraryRoute
 import net.bonysoft.bonusstage.ui.profile.ProfileRoute
 import net.bonysoft.bonusstage.ui.recent.RecentRoute
+import net.bonysoft.bonusstage.ui.rom.RomScanRoute
 import net.bonysoft.bonusstage.ui.share.RecapRoute
 import net.bonysoft.bonusstage.ui.signin.SignInRoute
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
@@ -86,9 +88,10 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
             ),
             entryProvider = entryProvider {
                 entry<ProfileTab> { ProfileRoute(onOpenGame = openGame, onOpenRecap = { backStack.add(Recap) }) }
-                entry<LibraryTab> { LibraryRoute(onOpenGame = openGame) }
+                entry<LibraryTab> { LibraryRoute(onOpenGame = openGame, onScanRoms = { backStack.add(RomScan) }) }
                 entry<RecentTab> { RecentRoute(onOpenGame = openGame) }
                 entry<WishlistTab> { WishlistRoute(onOpenGame = openGame) }
+                entry<RomScan> { RomScanRoute(onBack = { backStack.removeLastOrNull() }, onOpenGame = openGame) }
                 entry<Recap> { RecapRoute(onBack = { backStack.removeLastOrNull() }) }
                 entry<GameDetail> { GameDetailRoute(gameId = it.gameId, onBack = { backStack.removeLastOrNull() }) }
             },

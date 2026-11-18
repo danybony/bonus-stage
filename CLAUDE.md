@@ -11,6 +11,8 @@ The full plan, with the research behind it, is in `docs/plan.md` (Italian). Deci
 - `ra-api/` – KMP library: Ktor client and kotlinx.serialization models for the RA Web API. No app logic. Also has a plain `jvm` target for the daily contract tests, so the app and the CI check use the same models.
 - `iosApp/` – Xcode project hosting the shared UI. Its build phase runs `:composeApp:embedAndSignAppleFrameworkForXcode`.
 
+- `third_party/rcheevos` – git submodule (MIT, pinned to a release tag) with rcheevos' rhash, built with CMake/NDK in `androidApp/src/main/cpp` for the ROM scan. Clone with `--recurse-submodules` or run `git submodule update --init`.
+
 Package and application id: `net.bonysoft.bonusstage`. Versions live in `gradle/libs.versions.toml`.
 
 Every Navigation 3 destination must be registered in `navSavedStateConfiguration` (`navigation/Destinations.kt`): iOS has no reflection to save and restore the back stack.
@@ -56,7 +58,7 @@ UI code uses `RetroTheme.colors` and `RetroTheme.typography` (`ui/theme/`) and t
 
 ## Commands
 
-Requires JDK 17+ (CI uses 21) and an Android SDK with `sdk.dir` in `local.properties`. iOS needs macOS with Xcode.
+Requires JDK 17+ (CI uses 21), an Android SDK with `sdk.dir` in `local.properties`, NDK 30 and CMake 3.31 (Gradle installs them if missing), and the rcheevos submodule. iOS needs macOS with Xcode.
 
 | Task | Command |
 | --- | --- |

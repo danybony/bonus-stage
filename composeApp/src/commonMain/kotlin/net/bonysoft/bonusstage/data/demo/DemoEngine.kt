@@ -54,7 +54,7 @@ fun demoHttpClient(): HttpClient = HttpClient(
             "API_GetActiveClaims" -> ok(ListSerializer(ActiveClaim.serializer()), DemoData.activeClaims())
             "API_GetUserAwards" -> ok(UserAwards.serializer(), DemoData.awards())
             "API_GetConsoleIDs" -> ok(ListSerializer(Console.serializer()), DemoData.consoles())
-            "API_GetGameList" -> ok(ListSerializer(GameListEntry.serializer()), emptyList())
+            "API_GetGameList" -> ok(ListSerializer(GameListEntry.serializer()), DemoData.gameList(params["i"]?.toIntOrNull() ?: 0))
             "API_GetAchievementOfTheWeek" -> ok(AchievementOfTheWeek.serializer(), DemoData.achievementOfTheWeek())
             else -> respondError(HttpStatusCode.NotFound)
         }

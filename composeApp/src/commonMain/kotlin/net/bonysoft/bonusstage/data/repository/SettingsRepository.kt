@@ -29,6 +29,11 @@ class SettingsRepository(
 
     suspend fun setScreenEffect(effect: ScreenEffect) = put(KEY_SCREEN_EFFECT, effect.name)
 
+    /** The last ROM folder scanned (a platform folder reference, such as a SAF tree URI). */
+    val romFolder: Flow<String?> = queries.setting(KEY_ROM_FOLDER).asFlow().mapToOneOrNull(dispatcher)
+
+    suspend fun setRomFolder(folder: String) = put(KEY_ROM_FOLDER, folder)
+
     private fun boolean(key: String, default: Boolean): Flow<Boolean> =
         queries.setting(key).asFlow().mapToOneOrNull(dispatcher).map { it?.toBooleanStrictOrNull() ?: default }
 
@@ -39,5 +44,6 @@ class SettingsRepository(
     private companion object {
         const val KEY_HIDE_SPOILERS = "hide_spoilers"
         const val KEY_SCREEN_EFFECT = "screen_effect"
+        const val KEY_ROM_FOLDER = "rom_folder"
     }
 }

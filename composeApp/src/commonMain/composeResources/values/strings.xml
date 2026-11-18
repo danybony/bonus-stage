@@ -157,4 +157,20 @@
     <string name="effect_lcd">LCD grid</string>
     <string name="effect_scanlines">Scanlines</string>
     <string name="effect_crt">CRT</string>
+
+    <string name="rom_scan">Scan ROMs</string>
+    <string name="rom_title">ROM scan</string>
+    <string name="rom_intro_title">YOUR COLLECTION</string>
+    <string name="rom_intro">Pick the folder with your ROMs. Each file is hashed on this device, like an emulator does, and matched against the RetroAchievements catalog. Files never leave the device; only one catalog request per console is sent.</string>
+    <string name="rom_pick">Choose folder</string>
+    <string name="rom_rescan">Scan again</string>
+    <string name="rom_change">Change folder</string>
+    <string name="rom_listing">Looking for ROMs…</string>
+    <string name="rom_hashing">Hashing %1$s of %2$s</string>
+    <string name="rom_catalog">Checking the catalog of %1$s consoles…</string>
+    <string name="rom_with_achievements">WITH ACHIEVEMENTS</string>
+    <string name="rom_unknown">NOT RECOGNISED</string>
+    <string name="rom_unknown_help">No supported hash in the catalog: a different dump, a hack without a set, or a multi-file disc image (.cue/.gdi), which is not supported yet.</string>
+    <string name="rom_summary">%1$s files scanned · %2$s with achievements</string>
+    <string name="rom_game_detail">%1$s achievements · %2$s pts</string>
 </resources>

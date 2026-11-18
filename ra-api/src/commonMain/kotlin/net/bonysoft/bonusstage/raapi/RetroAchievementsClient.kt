@@ -105,11 +105,12 @@ class RetroAchievementsClient(
             "a" to activeOnly.toFlag(), "g" to gameSystemsOnly.toFlag(),
         )
 
-    suspend fun getGameList(consoleId: Int, withAchievementsOnly: Boolean = true): List<GameListEntry> =
+    /** The console's games; [withHashes] adds the ROM hashes each game supports (for ROM scans). */
+    suspend fun getGameList(consoleId: Int, withAchievementsOnly: Boolean = true, withHashes: Boolean = false): List<GameListEntry> =
         call(
             "API_GetGameList",
             ListSerializer(GameListEntry.serializer()),
-            "i" to consoleId, "f" to withAchievementsOnly.toFlag(),
+            "i" to consoleId, "f" to withAchievementsOnly.toFlag(), "h" to withHashes.toFlag(),
         )
 
     suspend fun getAchievementOfTheWeek(): AchievementOfTheWeek =
