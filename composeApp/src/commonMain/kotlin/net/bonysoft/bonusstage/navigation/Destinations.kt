@@ -6,8 +6,24 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
+/** The four tabs of the bottom bar. Selecting one resets the back stack to it. */
 @Serializable
-data object Home : NavKey
+sealed interface TopLevel : NavKey
+
+@Serializable
+data object ProfileTab : TopLevel
+
+@Serializable
+data object LibraryTab : TopLevel
+
+@Serializable
+data object RecentTab : TopLevel
+
+@Serializable
+data object WishlistTab : TopLevel
+
+@Serializable
+data class GameDetail(val gameId: Long) : NavKey
 
 /**
  * iOS has no reflection, so every destination must be registered here to be saved and restored.
@@ -15,7 +31,11 @@ data object Home : NavKey
 val navSavedStateConfiguration = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
-            subclass(Home::class, Home.serializer())
+            subclass(ProfileTab::class, ProfileTab.serializer())
+            subclass(LibraryTab::class, LibraryTab.serializer())
+            subclass(RecentTab::class, RecentTab.serializer())
+            subclass(WishlistTab::class, WishlistTab.serializer())
+            subclass(GameDetail::class, GameDetail.serializer())
         }
     }
 }
