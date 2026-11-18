@@ -292,17 +292,22 @@ object DemoData {
         },
     )
 
-    /** The demo catalog of a console: the demo games, without ROM hashes. */
+    /** The demo catalog of a console: the demo and wishlist games, without ROM hashes. */
     fun gameList(consoleId: Int) = games.filter { it.consoleId == consoleId }.map { game ->
         net.bonysoft.bonusstage.raapi.model.GameListEntry(
             id = game.id, title = game.title, consoleId = game.consoleId, consoleName = game.consoleName,
             imageIcon = game.icon, numAchievements = game.achievements.size, points = game.achievements.sumOf { it.points },
         )
+    } + wishlist.filter { wanted -> wanted.consoleId == consoleId && games.none { it.id == wanted.gameId } }.map {
+        net.bonysoft.bonusstage.raapi.model.GameListEntry(
+            id = it.gameId, title = it.title, consoleId = it.consoleId, consoleName = it.consoleName,
+            imageIcon = it.imageIcon, numAchievements = it.achievementsPublished, points = it.pointsTotal,
+        )
     }
 
-    fun consoles() = games.distinctBy { it.consoleId }.map {
-        Console(it.consoleId, it.consoleName, "https://static.retroachievements.org/assets/images/system/unknown.png", active = true, isGameSystem = true)
-    }
+    fun consoles() = (games.map { it.consoleId to it.consoleName } + wishlist.map { it.consoleId to it.consoleName })
+        .distinctBy { it.first }
+        .map { (id, name) -> Console(id, name, "https://static.retroachievements.org/assets/images/system/unknown.png", active = true, isGameSystem = true) }
 
     fun achievementOfTheWeek() = AchievementOfTheWeek(
         achievement = AchievementOfTheWeek.Achievement(178634, "Saved Summer", "Defeat the Flower and let Summer Get Busy", 10, 11),

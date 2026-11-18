@@ -26,6 +26,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.bonysoft.bonusstage.data.alerts.NotificationPermissionState
 import net.bonysoft.bonusstage.data.alerts.rememberNotificationPermissionState
@@ -44,6 +45,7 @@ import net.bonysoft.bonusstage.resources.wishlist_status_in_development
 import net.bonysoft.bonusstage.resources.wishlist_status_no_set
 import net.bonysoft.bonusstage.resources.wishlist_status_published
 import net.bonysoft.bonusstage.resources.wishlist_status_revision
+import net.bonysoft.bonusstage.resources.search_games
 import net.bonysoft.bonusstage.resources.wishlist_title
 import net.bonysoft.bonusstage.resources.wishlist_waiting
 import net.bonysoft.bonusstage.ui.common.formatDate
@@ -54,6 +56,7 @@ import net.bonysoft.bonusstage.ui.components.PixelIcons
 import net.bonysoft.bonusstage.ui.components.RefreshableContent
 import net.bonysoft.bonusstage.ui.components.RetroBadge
 import net.bonysoft.bonusstage.ui.components.RetroButton
+import net.bonysoft.bonusstage.ui.components.RetroChip
 import net.bonysoft.bonusstage.ui.components.RetroScaffold
 import net.bonysoft.bonusstage.ui.components.RetroTag
 import net.bonysoft.bonusstage.ui.components.RetroWindow
@@ -64,13 +67,24 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WishlistRoute(onOpenGame: (Long) -> Unit, modifier: Modifier = Modifier, viewModel: WishlistViewModel = koinViewModel()) {
+fun WishlistRoute(
+    onOpenGame: (Long) -> Unit,
+    onSearch: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: WishlistViewModel = koinViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    // Back from the website or the search: refetch if the list was marked stale meanwhile.
+    LifecycleResumeEffect(Unit) {
+        viewModel.refresh(force = false)
+        onPauseOrDispose { }
+    }
     WishlistScreen(
         state = state,
         permission = rememberNotificationPermissionState(),
         onRefresh = viewModel::refresh,
         onOpenGame = onOpenGame,
+        onSearch = onSearch,
         modifier = modifier,
     )
 }
@@ -81,10 +95,15 @@ fun WishlistScreen(
     permission: NotificationPermissionState,
     onRefresh: () -> Unit,
     onOpenGame: (Long) -> Unit,
+    onSearch: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = RetroTheme.colors
-    RetroScaffold(title = stringResource(Res.string.wishlist_title), modifier = modifier) {
+    RetroScaffold(
+        title = stringResource(Res.string.wishlist_title),
+        modifier = modifier,
+        actions = { RetroChip(stringResource(Res.string.search_games), selected = false, onClick = onSearch) },
+    ) {
         RefreshableContent(data = state.sections, status = state.status, onRefresh = onRefresh) { sections ->
             AdaptiveList {
                 state.status.error?.let { error -> fullLineItem(key = "stale") { StaleNotice(error) } }

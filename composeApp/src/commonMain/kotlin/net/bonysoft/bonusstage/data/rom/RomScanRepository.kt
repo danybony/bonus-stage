@@ -2,12 +2,8 @@ package net.bonysoft.bonusstage.data.rom
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import net.bonysoft.bonusstage.data.account.AccountRepository
-import net.bonysoft.bonusstage.data.cache.RefreshPolicy
-import net.bonysoft.bonusstage.data.cache.Refresher
+import net.bonysoft.bonusstage.data.repository.CatalogRepository
 import net.bonysoft.bonusstage.db.BonusStageDatabase
-import net.bonysoft.bonusstage.db.Catalog_game
-import net.bonysoft.bonusstage.db.Catalog_hash
 import net.bonysoft.bonusstage.raapi.RaMedia
 
 data class CatalogGame(
@@ -51,15 +47,13 @@ fun matchRoms(hashed: List<Pair<RomFile, List<RomHash>>>, catalog: Map<RomHash, 
 
 /**
  * Scans a ROM folder (issue #17): hashes every candidate file with rhash, then matches the hashes
- * against the catalog of the consoles found. The catalog with hashes costs one API call per
- * console and is cached for [RefreshPolicy.catalog].
+ * against the catalog of the consoles found (CatalogRepository: one API call per console, cached
+ * weekly).
  */
 class RomScanRepository(
     private val library: RomLibrary,
     private val database: BonusStageDatabase,
-    private val accounts: AccountRepository,
-    private val refresher: Refresher,
-    private val policy: RefreshPolicy,
+    private val catalog: CatalogRepository,
 ) {
     private val queries get() = database.cacheQueries
 
@@ -72,7 +66,7 @@ class RomScanRepository(
         }
         val consoles = hashed.flatMap { (_, hashes) -> hashes.map { it.consoleId } }.distinct()
         emit(ScanProgress.LoadingCatalog(consoles.size))
-        consoles.forEach { refreshCatalog(it) }
+        consoles.forEach { catalog.refreshConsole(it) }
         val catalog = consoles.flatMap { console ->
             val hashes = hashed.flatMap { it.second }.filter { it.consoleId == console }.map { it.hash }.distinct()
             hashes.chunked(500).flatMap { chunk -> queries.catalogMatches(console.toLong(), chunk).executeAsList() }
@@ -84,23 +78,5 @@ class RomScanRepository(
                 }
         }.toMap()
         emit(ScanProgress.Done(matchRoms(hashed, catalog)))
-    }
-
-    private suspend fun refreshCatalog(consoleId: Int) {
-        refresher.refresh("catalog:$consoleId", policy.catalog, force = false) {
-            val games = accounts.client().getGameList(consoleId, withAchievementsOnly = true, withHashes = true)
-            database.transaction {
-                queries.deleteCatalogForConsole(consoleId.toLong())
-                games.forEach { game ->
-                    queries.insertCatalogGame(
-                        Catalog_game(
-                            game.id, game.consoleId.toLong(), game.consoleName, game.title, game.imageIcon,
-                            game.numAchievements.toLong(), game.points.toLong(),
-                        ),
-                    )
-                    game.hashes.forEach { hash -> queries.insertCatalogHash(Catalog_hash(hash.lowercase(), consoleId.toLong(), game.id)) }
-                }
-            }
-        }
     }
 }

@@ -179,12 +179,21 @@ CREATE TABLE catalog_hash (
     PRIMARY KEY (hash, game_id)
 );
 
+CREATE TABLE console (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
 -- sync_state
 fetchedAt:
 SELECT fetched_at FROM sync_state WHERE resource = ?;
 
 markFetched:
 INSERT OR REPLACE INTO sync_state(resource, fetched_at) VALUES (?, ?);
+
+-- Forces the next refresh of a resource, for example after the user edited it on the website.
+invalidate:
+DELETE FROM sync_state WHERE resource = ?;
 
 -- profile
 profile:
@@ -334,6 +343,25 @@ INSERT OR REPLACE INTO catalog_game VALUES ?;
 insertCatalogHash:
 INSERT OR REPLACE INTO catalog_hash VALUES ?;
 
+consoles:
+SELECT * FROM console ORDER BY name;
+
+deleteConsoles:
+DELETE FROM console;
+
+insertConsole:
+INSERT OR REPLACE INTO console VALUES ?;
+
+-- Title search, ignoring case; prefix matches first.
+searchCatalog:
+SELECT * FROM catalog_game
+WHERE title LIKE '%' || :query || '%'
+ORDER BY CASE WHEN title LIKE :query || '%' THEN 0 ELSE 1 END, num_achievements = 0, title
+LIMIT :limit;
+
+catalogGameCount:
+SELECT count(*) FROM catalog_game;
+
 catalogMatches:
 SELECT h.hash, g.*
 FROM catalog_hash h JOIN catalog_game g ON g.id = h.game_id
@@ -341,6 +369,7 @@ WHERE h.console_id = :consoleId AND h.hash IN :hashes;
 
 -- sign-out
 clearAll {
+    DELETE FROM console;
     DELETE FROM catalog_game;
     DELETE FROM catalog_hash;
     DELETE FROM followed_user;

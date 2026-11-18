@@ -172,4 +172,12 @@
     <string name="rom_unknown_help">No supported hash in the catalog: a different dump, a hack without a set, or a multi-file disc image (.cue/.gdi), which is not supported yet.</string>
     <string name="rom_summary">%1$s files scanned · %2$s with achievements</string>
     <string name="rom_game_detail">%1$s achievements · %2$s pts</string>
+
+    <string name="search_games">Search</string>
+    <string name="search_title">Find games</string>
+    <string name="search_field">Game title</string>
+    <string name="search_hint">Tap a game to open its page on retroachievements.org, then add it to Want to Play there: the app cannot change your list, the API is read-only. It appears here when you come back.</string>
+    <string name="search_syncing">Downloading the catalog: %1$s of %2$s consoles</string>
+    <string name="search_no_results">No games match "%1$s".</string>
+    <string name="search_no_set">No achievements yet</string>
 </resources>

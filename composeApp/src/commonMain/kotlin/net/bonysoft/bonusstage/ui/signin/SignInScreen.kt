@@ -25,7 +25,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -53,7 +52,9 @@ import net.bonysoft.bonusstage.resources.sign_in_tagline
 import net.bonysoft.bonusstage.resources.sign_in_title
 import net.bonysoft.bonusstage.resources.sign_in_unofficial
 import net.bonysoft.bonusstage.resources.sign_in_username
+import net.bonysoft.bonusstage.ui.common.RaLinks
 import net.bonysoft.bonusstage.ui.common.errorMessage
+import net.bonysoft.bonusstage.ui.common.rememberWebOpener
 import net.bonysoft.bonusstage.ui.components.PixelIcon
 import net.bonysoft.bonusstage.ui.components.PixelIcons
 import net.bonysoft.bonusstage.ui.components.RetroButton
@@ -64,8 +65,6 @@ import net.bonysoft.bonusstage.ui.components.RetroWindow
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-
-private const val RA_SETTINGS_URL = "https://retroachievements.org/settings"
 
 @Composable
 fun SignInRoute(modifier: Modifier = Modifier, viewModel: SignInViewModel = koinViewModel()) {
@@ -90,7 +89,7 @@ fun SignInScreen(
     modifier: Modifier = Modifier,
 ) {
     val colors = RetroTheme.colors
-    val uriHandler = LocalUriHandler.current
+    val web = rememberWebOpener()
     var showKey by rememberSaveable { mutableStateOf(false) }
     val error = when (val e = state.error) {
         null -> null
@@ -161,7 +160,7 @@ fun SignInScreen(
                 Text(stringResource(Res.string.sign_in_key_help), style = RetroTheme.typography.bodySmall, color = colors.onWindowMuted)
                 RetroMenuItem(
                     text = stringResource(Res.string.sign_in_open_settings),
-                    onClick = { uriHandler.openUri(RA_SETTINGS_URL) },
+                    onClick = { web.open(RaLinks.SETTINGS) },
                 )
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     RetroButton(
