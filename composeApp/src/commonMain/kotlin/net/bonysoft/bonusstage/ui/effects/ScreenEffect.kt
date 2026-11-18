@@ -29,12 +29,12 @@ half4 main(float2 coord) {
     if (mode < 1.5) {
         half4 color = content.eval(coord);
         float2 cell = mod(coord, 4.0 * scale);
-        float grid = (cell.x < scale || cell.y < scale) ? 0.78 : 1.0;
+        float grid = (cell.x < scale || cell.y < scale) ? 0.9 : 1.0;
         return half4(color.rgb * grid, color.a);
     }
     if (mode < 2.5) {
         half4 color = content.eval(coord);
-        float line = mod(coord.y, 3.0 * scale) < scale ? 0.6 : 1.0;
+        float line = mod(coord.y, 3.0 * scale) < scale ? 0.82 : 1.0;
         return half4(color.rgb * line, color.a);
     }
     float2 uv = coord / resolution * 2.0 - 1.0;
@@ -46,7 +46,7 @@ half4 main(float2 coord) {
     half r = content.eval(bent + float2(0.6 * scale, 0.0)).r;
     half g = content.eval(bent).g;
     half b = content.eval(bent - float2(0.6 * scale, 0.0)).b;
-    float line = mod(bent.y, 3.0 * scale) < scale ? 0.65 : 1.0;
+    float line = mod(bent.y, 3.0 * scale) < scale ? 0.84 : 1.0;
     float vignette = 1.0 - 0.35 * dot(uv * 0.9, uv * 0.9);
     return half4(half3(r, g, b) * line * vignette, 1.0);
 }
@@ -57,7 +57,7 @@ fun Modifier.overlayEffect(effect: ScreenEffect): Modifier {
     if (effect == ScreenEffect.Off) return this
     return drawWithContent {
         drawContent()
-        val shade = Color.Black.copy(alpha = if (effect == ScreenEffect.Lcd) 0.22f else 0.4f)
+        val shade = Color.Black.copy(alpha = if (effect == ScreenEffect.Lcd) 0.1f else 0.18f)
         // In dp, like the shader: one-pixel lines are invisible on dense screens.
         val line = density
         val step = (if (effect == ScreenEffect.Lcd) 4f else 3f) * density
