@@ -27,7 +27,7 @@ Keep platform code to what cannot be shared. Anything that can live in `commonMa
 
 ## Cache policy (ADR 0002)
 
-Cache-first, local only, no backend. Show cached data immediately, refresh after. Initial refresh intervals (tune later, keep them in one config object):
+Cache-first, local only, no backend. Show cached data immediately, refresh after. Repositories in `data/repository/` expose `observe…()` flows from SQLDelight (`Cache.sq`) and a separate `refresh(force)` that only calls the API when the data is stale (`Refresher`). Initial refresh intervals, all in `RefreshPolicy` (`data/cache/`):
 
 | Data | Refresh |
 | --- | --- |
