@@ -60,3 +60,14 @@ data class FollowedUser(
     @Serializable(with = net.bonysoft.bonusstage.raapi.internal.FlexibleBooleanSerializer::class)
     @SerialName("IsFollowingMe") val isFollowingMe: Boolean = false,
 )
+
+/** One entry of `API_GetUsersFollowingMe`: someone who follows the key's owner. */
+@Serializable
+data class Follower(
+    @SerialName("User") val user: String,
+    @SerialName("ULID") val ulid: String,
+    @SerialName("Points") val points: Long,
+    @SerialName("PointsSoftcore") val pointsSoftcore: Long = 0,
+    @Serializable(with = net.bonysoft.bonusstage.raapi.internal.FlexibleBooleanSerializer::class)
+    @SerialName("AmIFollowing") val amIFollowing: Boolean = false,
+)

@@ -17,8 +17,10 @@ import net.bonysoft.bonusstage.data.createTestDatabase
 import net.bonysoft.bonusstage.data.demo.demoHttpClient
 import net.bonysoft.bonusstage.domain.Award
 import net.bonysoft.bonusstage.domain.SetStatus
+import net.bonysoft.bonusstage.raapi.RaApiException
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
@@ -192,5 +194,28 @@ class RepositoriesTest {
         wishlist.markStale()
 
         assertTrue(wishlist.refresh(), "refetched although younger than the wishlist interval")
+    }
+
+    @Test
+    fun friendListsLookupAndStaleness() = runTest {
+        val accounts = signedInDemo()
+        val friends = FriendsRepository(database, accounts, refresher, policy, clock, Dispatchers.Unconfined)
+
+        friends.refreshLists()
+        val calls = apiCalls
+        friends.refreshLists()
+
+        assertEquals(3, friends.observeFollowing().first().size)
+        val followers = friends.observeFollowers().first()
+        assertEquals(listOf("CartridgeKid", "PixelPilgrim", "RetroRita"), followers.map { it.username })
+        assertFalse(followers.single { it.username == "RetroRita" }.mutual)
+        assertEquals(calls, apiCalls, "fresh lists are not fetched again")
+
+        friends.markStale()
+        friends.refreshLists()
+        assertEquals(calls + 2, apiCalls, "both lists refetched after a visit to the website")
+
+        assertTrue(friends.lookUp("pixelpilgrim").mutual)
+        assertFailsWith<RaApiException.NotFound> { friends.lookUp("nobody-at-all") }
     }
 }

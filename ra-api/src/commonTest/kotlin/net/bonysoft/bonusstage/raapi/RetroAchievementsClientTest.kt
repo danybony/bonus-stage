@@ -125,6 +125,14 @@ class RetroAchievementsClientTest {
     }
 
     @Test
+    fun followersDecode() = runTest {
+        val follower = client(body = Fixtures.USERS_FOLLOWING_ME).getUsersFollowingMe().results.single()
+
+        assertTrue(follower.amIFollowing)
+        assertEquals("/API/API_GetUsersFollowingMe.php", requests.last().url.encodedPath)
+    }
+
+    @Test
     fun usersIFollowHasNoUserParameter() = runTest {
         val page = client(body = Fixtures.USERS_I_FOLLOW).getUsersIFollow(count = 50)
 

@@ -52,6 +52,7 @@ import net.bonysoft.bonusstage.resources.profile_recently_played
 import net.bonysoft.bonusstage.resources.profile_softcore
 import net.bonysoft.bonusstage.resources.profile_title
 import net.bonysoft.bonusstage.resources.profile_true_points
+import net.bonysoft.bonusstage.resources.friends_title
 import net.bonysoft.bonusstage.resources.profile_unranked
 import net.bonysoft.bonusstage.resources.effect_crt
 import net.bonysoft.bonusstage.resources.effect_lcd
@@ -90,6 +91,7 @@ import kotlin.time.Instant
 fun ProfileRoute(
     onOpenGame: (Long) -> Unit,
     onOpenRecap: () -> Unit,
+    onOpenFriends: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
@@ -99,6 +101,7 @@ fun ProfileRoute(
         onRefresh = viewModel::refresh,
         onOpenGame = onOpenGame,
         onOpenRecap = onOpenRecap,
+        onOpenFriends = onOpenFriends,
         onSelectEffect = viewModel::setScreenEffect,
         onSignOut = viewModel::signOut,
         modifier = modifier,
@@ -111,6 +114,7 @@ fun ProfileScreen(
     onRefresh: () -> Unit,
     onOpenGame: (Long) -> Unit,
     onOpenRecap: () -> Unit,
+    onOpenFriends: () -> Unit,
     onSelectEffect: (ScreenEffect) -> Unit,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
@@ -135,6 +139,7 @@ fun ProfileScreen(
                 }
                 item(key = "options") {
                     RetroWindow(title = stringResource(Res.string.profile_options), modifier = Modifier.fillMaxWidth()) {
+                        RetroMenuItem(text = stringResource(Res.string.friends_title), onClick = onOpenFriends)
                         RetroMenuItem(text = stringResource(Res.string.recap_title), onClick = onOpenRecap)
                         Text(
                             stringResource(Res.string.effect_title),
@@ -311,7 +316,7 @@ private fun ProfileScreenPreview() {
                 isDemo = true,
                 status = RefreshStatus(),
             ),
-            onRefresh = {}, onOpenGame = {}, onOpenRecap = {}, onSelectEffect = {}, onSignOut = {},
+            onRefresh = {}, onOpenGame = {}, onOpenRecap = {}, onOpenFriends = {}, onSelectEffect = {}, onSignOut = {},
         )
     }
 }

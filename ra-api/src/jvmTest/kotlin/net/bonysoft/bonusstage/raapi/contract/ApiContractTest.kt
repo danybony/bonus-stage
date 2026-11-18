@@ -10,6 +10,7 @@ import net.bonysoft.bonusstage.raapi.model.AchievementOfTheWeek
 import net.bonysoft.bonusstage.raapi.model.ActiveClaim
 import net.bonysoft.bonusstage.raapi.model.Console
 import net.bonysoft.bonusstage.raapi.model.FollowedUser
+import net.bonysoft.bonusstage.raapi.model.Follower
 import net.bonysoft.bonusstage.raapi.model.GameInfoAndUserProgress
 import net.bonysoft.bonusstage.raapi.model.GameListEntry
 import net.bonysoft.bonusstage.raapi.model.GameProgress
@@ -60,6 +61,7 @@ class ApiContractTest {
             arrayOf("u" to it, "c" to 20)
         },
         Check("users-i-follow", "API_GetUsersIFollow", Page.serializer(FollowedUser.serializer())) { arrayOf("c" to 20) },
+        Check("users-following-me", "API_GetUsersFollowingMe", Page.serializer(Follower.serializer())) { arrayOf("c" to 20) },
         Check("active-claims", "API_GetActiveClaims", ListSerializer(ActiveClaim.serializer())) { emptyArray() },
         Check("user-awards", "API_GetUserAwards", UserAwards.serializer()) { arrayOf("u" to it) },
         Check("console-ids", "API_GetConsoleIDs", ListSerializer(Console.serializer())) { arrayOf("a" to 1, "g" to 1) },

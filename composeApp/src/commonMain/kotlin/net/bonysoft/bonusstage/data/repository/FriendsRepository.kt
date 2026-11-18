@@ -13,8 +13,10 @@ import net.bonysoft.bonusstage.data.cache.RefreshPolicy
 import net.bonysoft.bonusstage.data.cache.Refresher
 import net.bonysoft.bonusstage.db.BonusStageDatabase
 import net.bonysoft.bonusstage.db.Followed_user
+import net.bonysoft.bonusstage.db.Follower
 import net.bonysoft.bonusstage.db.Friend_unlock
 import net.bonysoft.bonusstage.domain.FriendUnlock
+import net.bonysoft.bonusstage.domain.Player
 import net.bonysoft.bonusstage.raapi.RaMedia
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -60,6 +62,47 @@ class FriendsRepository(
 
     fun hasBeenFetched(): Boolean = refresher.fetchedAt("following:${accounts.requireUlid()}") != null
 
+    fun observeFollowing(): Flow<List<Player>> =
+        queries.followedUsers(accounts.requireUlid()).asFlow().mapToList(dispatcher).map { rows ->
+            rows.map { Player(it.ulid, it.username, RaMedia.userPic(it.username), it.points, mutual = it.follows_me == 1L) }
+        }
+
+    fun observeFollowers(): Flow<List<Player>> =
+        queries.followers(accounts.requireUlid()).asFlow().mapToList(dispatcher).map { rows ->
+            rows.map { Player(it.ulid, it.username, RaMedia.userPic(it.username), it.points, mutual = it.i_follow == 1L) }
+        }
+
+    /** The user may have followed or unfollowed someone on the website: refetch both lists next time. */
+    fun markStale() {
+        val owner = accounts.requireUlid()
+        refresher.invalidate("following:$owner")
+        refresher.invalidate("followers:$owner")
+    }
+
+    /** Refreshes the follow lists only (no per-friend calls), for the friends screen. */
+    suspend fun refreshLists(force: Boolean = false) {
+        val owner = accounts.requireUlid()
+        refreshFollowing(owner, force)
+        refresher.refresh("followers:$owner", policy.following, force) {
+            val followers = fetchAllPages { count, offset -> accounts.client().getUsersFollowingMe(count, offset) }
+            database.transaction {
+                queries.deleteFollowers(owner)
+                followers.forEach { queries.insertFollower(Follower(owner, it.ulid, it.user, it.points, it.amIFollowing.toLong())) }
+            }
+        }
+    }
+
+    /**
+     * Finds a player by exact username (the API has no user search). Throws
+     * [net.bonysoft.bonusstage.raapi.RaApiException.NotFound] when there is nobody with that name.
+     */
+    suspend fun lookUp(username: String): Player {
+        val profile = accounts.client().getUserProfile(username.trim())
+        val owner = accounts.requireUlid()
+        val following = queries.followedUsers(owner).executeAsList().any { it.ulid == profile.ulid }
+        return Player(profile.ulid, profile.user, RaMedia.image(profile.userPic), profile.totalPoints, following, profile.motto?.takeIf { it.isNotBlank() })
+    }
+
     /**
      * Refreshes the follow list when stale, then the unlocks of the friends due for an update.
      * Returns how many friends were fetched. [force] refetches the list and ignores the per-friend
@@ -68,16 +111,7 @@ class FriendsRepository(
     suspend fun refresh(force: Boolean = false): Int {
         val owner = accounts.requireUlid()
         val client = accounts.client()
-        refresher.refresh("following:$owner", policy.following, force) {
-            val following = fetchAllPages { count, offset -> client.getUsersIFollow(count, offset) }
-            database.transaction {
-                queries.deleteFollowedUsers(owner)
-                following.forEach {
-                    queries.insertFollowedUser(Followed_user(owner, it.ulid, it.user, it.points, it.isFollowingMe.toLong()))
-                }
-                queries.deleteUnfollowedUnlocks(owner)
-            }
-        }
+        refreshFollowing(owner, force)
         val due = friendsDue(owner, force)
         due.forEach { friend ->
             refresher.refresh(friendResource(owner, friend.ulid), policy.friendUnlocks, force = true) {
@@ -96,6 +130,19 @@ class FriendsRepository(
             }
         }
         return due.size
+    }
+
+    private suspend fun refreshFollowing(owner: String, force: Boolean) {
+        refresher.refresh("following:$owner", policy.following, force) {
+            val following = fetchAllPages { count, offset -> accounts.client().getUsersIFollow(count, offset) }
+            database.transaction {
+                queries.deleteFollowedUsers(owner)
+                following.forEach {
+                    queries.insertFollowedUser(Followed_user(owner, it.ulid, it.user, it.points, it.isFollowingMe.toLong()))
+                }
+                queries.deleteUnfollowedUnlocks(owner)
+            }
+        }
     }
 
     /** Friends whose unlocks are stale, oldest (or never fetched) first, capped per refresh. */

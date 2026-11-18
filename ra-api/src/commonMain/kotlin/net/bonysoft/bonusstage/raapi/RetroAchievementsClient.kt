@@ -17,6 +17,7 @@ import net.bonysoft.bonusstage.raapi.model.AchievementOfTheWeek
 import net.bonysoft.bonusstage.raapi.model.ActiveClaim
 import net.bonysoft.bonusstage.raapi.model.Console
 import net.bonysoft.bonusstage.raapi.model.FollowedUser
+import net.bonysoft.bonusstage.raapi.model.Follower
 import net.bonysoft.bonusstage.raapi.model.GameInfoAndUserProgress
 import net.bonysoft.bonusstage.raapi.model.GameListEntry
 import net.bonysoft.bonusstage.raapi.model.GameProgress
@@ -91,6 +92,10 @@ class RetroAchievementsClient(
     /** The people the owner of the web API key follows (no user parameter: it is always the key's owner). */
     suspend fun getUsersIFollow(count: Int = 500, offset: Int = 0): Page<FollowedUser> =
         call("API_GetUsersIFollow", Page.serializer(FollowedUser.serializer()), "c" to count, "o" to offset)
+
+    /** The people who follow the owner of the web API key. */
+    suspend fun getUsersFollowingMe(count: Int = 500, offset: Int = 0): Page<Follower> =
+        call("API_GetUsersFollowingMe", Page.serializer(Follower.serializer()), "c" to count, "o" to offset)
 
     suspend fun getActiveClaims(): List<ActiveClaim> =
         call("API_GetActiveClaims", ListSerializer(ActiveClaim.serializer()))

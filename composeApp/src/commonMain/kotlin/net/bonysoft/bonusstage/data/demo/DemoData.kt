@@ -255,6 +255,28 @@ object DemoData {
         },
     )
 
+    /** Made-up followers: PixelPilgrim and CartridgeKid follow back, RetroRita is not followed. */
+    fun followers() = Page(
+        count = 3,
+        total = 3,
+        results = listOf(
+            net.bonysoft.bonusstage.raapi.model.Follower(friends[0].name, friends[0].ulid, friends[0].points, 0, amIFollowing = true),
+            net.bonysoft.bonusstage.raapi.model.Follower(friends[1].name, friends[1].ulid, friends[1].points, 0, amIFollowing = true),
+            net.bonysoft.bonusstage.raapi.model.Follower("RetroRita", "00000000000000000000FRIEND4", 25_310, 0, amIFollowing = false),
+        ),
+    )
+
+    /** The demo user's profile, a demo player's, or null for an unknown name. */
+    fun profileOf(user: String?): UserProfile? {
+        if (user == null || user.equals(USERNAME, ignoreCase = true) || user == ULID) return profile()
+        val (name, ulid, points) = (friends.map { Triple(it.name, it.ulid, it.points) } + Triple("RetroRita", "00000000000000000000FRIEND4", 25_310L))
+            .firstOrNull { it.first.equals(user, ignoreCase = true) || it.second == user } ?: return null
+        return UserProfile(
+            user = name, ulid = ulid, userPic = "/UserPic/$name.png", memberSince = format(now() - 400.days),
+            totalPoints = points, totalSoftcorePoints = 0, totalTruePoints = points * 3, motto = "Demo player.", id = 2,
+        )
+    }
+
     /** Recent unlocks of the demo user, or of a demo friend when [user] is one of their ULIDs. */
     fun recentAchievementsOf(user: String?, minutes: Int): List<RecentAchievement> {
         val friend = friends.firstOrNull { it.ulid == user } ?: return recentAchievements(minutes)

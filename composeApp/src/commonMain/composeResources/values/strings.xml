@@ -180,4 +180,18 @@
     <string name="search_syncing">Downloading the catalog: %1$s of %2$s consoles</string>
     <string name="search_no_results">No games match "%1$s".</string>
     <string name="search_no_set">No achievements yet</string>
+
+    <string name="friends_title">Friends</string>
+    <string name="friends_manage">Manage</string>
+    <string name="friends_following_tab">Following %1$s</string>
+    <string name="friends_followers_tab">Followers %1$s</string>
+    <string name="friends_find_title">FIND A PLAYER</string>
+    <string name="friends_find_field">Exact username</string>
+    <string name="friends_find_button">Find</string>
+    <string name="friends_find_hint">The API has no search: type the full username. Following happens on retroachievements.org; the lists update when you come back.</string>
+    <string name="friends_open_profile">Open profile</string>
+    <string name="friends_points">%1$s points</string>
+    <string name="friends_follows_you">FOLLOWS YOU</string>
+    <string name="friends_you_follow">YOU FOLLOW</string>
+    <string name="friends_list_empty">Nobody here yet.</string>
 </resources>

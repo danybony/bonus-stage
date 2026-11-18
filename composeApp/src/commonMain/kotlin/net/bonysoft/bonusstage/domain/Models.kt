@@ -155,3 +155,14 @@ data class FriendUnlock(
     val gameTitle: String,
     val gameIconUrl: String,
 )
+
+/** Someone in the user's friends lists, or found by username. */
+data class Player(
+    val ulid: String,
+    val username: String,
+    val avatarUrl: String,
+    val points: Long,
+    /** In "following": they follow back. In "followers": the user follows them too. */
+    val mutual: Boolean,
+    val motto: String? = null,
+)
