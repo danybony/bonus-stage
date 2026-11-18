@@ -41,6 +41,8 @@ Cache-first, local only, no backend. Show cached data immediately, refresh after
 
 Retro, inspired by PokeDaisy (https://github.com/lidor30/pokedaisy): pixel fonts, screens styled after classic game menus, optional LCD/scanline/CRT effects later. Inspiration only: PokeDaisy is GPL-3.0, so never copy its code or assets into this repository. Check the license of every font and asset before adding it, and record it in `docs/assets.md`.
 
+UI code uses `RetroTheme.colors` and `RetroTheme.typography` (`ui/theme/`) and the components in `ui/components/` (`RetroWindow`, `RetroMenuItem`, `RetroProgressBar`, `RetroBadge`, `RetroButton`, `RetroDialog`, `RetroTextField`). Do not use Material components directly for visible UI. Images go through `RetroBadge` or Coil's `AsyncImage` with `FilterQuality.None` so pixel art stays sharp.
+
 ## Rules
 
 - Never commit API keys or credentials. Local keys go in `local.properties` (git-ignored); CI uses repository secrets.
