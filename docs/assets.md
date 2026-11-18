@@ -4,3 +4,5 @@ Every font, image or sound added to the project is listed here with its source a
 
 | Asset | Used for | Source | License |
 | --- | --- | --- | --- |
+| Pixel Operator (regular, bold) | Interface font: titles, menus, numbers | Jayvee Enaguas, https://www.dafont.com/pixel-operator.font | CC0 1.0 (`licenses/PixelOperator-CC0.txt`) |
+| Atkinson Hyperlegible (regular, bold) | Long text: descriptions, body copy | Braille Institute, https://github.com/google/fonts/tree/main/ofl/atkinsonhyperlegible | SIL OFL 1.1 (`licenses/AtkinsonHyperlegible-OFL.txt`) |
