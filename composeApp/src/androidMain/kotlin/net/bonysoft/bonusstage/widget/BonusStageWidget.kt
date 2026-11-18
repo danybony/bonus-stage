@@ -61,8 +61,9 @@ import org.koin.core.component.get
 private data class WidgetContent(val data: WidgetData, val images: Map<String, Bitmap>)
 
 /**
- * Home screen widget: the game being played with its progress and the latest unlocks, drawn as a
- * game window. Reads the cache only; WidgetSync redraws it when the cache changes.
+ * Home screen widget: the game being played with its progress and the latest unlocks, on the
+ * window cream (no frame: launchers round the corners). Reads the cache only; WidgetSync redraws it
+ * when the cache changes.
  */
 class BonusStageWidget : GlanceAppWidget(), KoinComponent {
 
