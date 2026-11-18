@@ -1,0 +1,269 @@
+-- Local cache of RetroAchievements data (ADR 0002). Rows are keyed by the user's ULID where they
+-- belong to a user. Dates are epoch milliseconds (UTC).
+
+-- When each resource was last fetched, for the refresh policy.
+CREATE TABLE sync_state (
+    resource TEXT NOT NULL PRIMARY KEY,
+    fetched_at INTEGER NOT NULL
+);
+
+CREATE TABLE user_profile (
+    ulid TEXT NOT NULL PRIMARY KEY,
+    username TEXT NOT NULL,
+    user_pic TEXT NOT NULL,
+    member_since INTEGER,
+    motto TEXT,
+    rich_presence TEXT,
+    last_game_id INTEGER,
+    hardcore_points INTEGER NOT NULL,
+    softcore_points INTEGER NOT NULL,
+    true_points INTEGER NOT NULL,
+    rank INTEGER,
+    total_ranked INTEGER,
+    status TEXT
+);
+
+CREATE TABLE recently_played (
+    ulid TEXT NOT NULL,
+    game_id INTEGER NOT NULL,
+    position INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    console_name TEXT NOT NULL,
+    image_icon TEXT NOT NULL,
+    last_played INTEGER,
+    PRIMARY KEY (ulid, game_id)
+);
+
+CREATE TABLE user_award_summary (
+    ulid TEXT NOT NULL PRIMARY KEY,
+    mastered INTEGER NOT NULL,
+    completed INTEGER NOT NULL,
+    beaten_hardcore INTEGER NOT NULL,
+    beaten_softcore INTEGER NOT NULL,
+    events INTEGER NOT NULL
+);
+
+-- Games and their achievement sets, shared by every user.
+CREATE TABLE game (
+    id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    console_id INTEGER NOT NULL,
+    console_name TEXT NOT NULL,
+    image_icon TEXT NOT NULL,
+    image_box_art TEXT,
+    publisher TEXT,
+    developer TEXT,
+    genre TEXT,
+    released TEXT,
+    num_players INTEGER
+);
+
+CREATE TABLE achievement (
+    id INTEGER NOT NULL PRIMARY KEY,
+    game_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    points INTEGER NOT NULL,
+    true_ratio INTEGER NOT NULL,
+    badge_name TEXT NOT NULL,
+    display_order INTEGER NOT NULL,
+    type TEXT,
+    num_awarded INTEGER NOT NULL,
+    num_awarded_hardcore INTEGER NOT NULL
+);
+
+CREATE INDEX achievement_game ON achievement(game_id);
+
+-- The user's progress per game, from the completion progress list.
+CREATE TABLE game_progress (
+    ulid TEXT NOT NULL,
+    game_id INTEGER NOT NULL,
+    max_possible INTEGER NOT NULL,
+    num_awarded INTEGER NOT NULL,
+    num_awarded_hardcore INTEGER NOT NULL,
+    most_recent_awarded INTEGER,
+    highest_award_kind TEXT,
+    highest_award_date INTEGER,
+    PRIMARY KEY (ulid, game_id)
+);
+
+CREATE TABLE achievement_unlock (
+    ulid TEXT NOT NULL,
+    achievement_id INTEGER NOT NULL,
+    game_id INTEGER NOT NULL,
+    earned_at INTEGER,
+    earned_hardcore_at INTEGER,
+    PRIMARY KEY (ulid, achievement_id)
+);
+
+CREATE TABLE recent_unlock (
+    ulid TEXT NOT NULL,
+    achievement_id INTEGER NOT NULL,
+    game_id INTEGER NOT NULL,
+    unlocked_at INTEGER NOT NULL,
+    hardcore INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    badge_name TEXT NOT NULL,
+    points INTEGER NOT NULL,
+    game_title TEXT NOT NULL,
+    game_icon TEXT NOT NULL,
+    console_name TEXT NOT NULL,
+    PRIMARY KEY (ulid, achievement_id)
+);
+
+CREATE TABLE wishlist_entry (
+    ulid TEXT NOT NULL,
+    game_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    image_icon TEXT NOT NULL,
+    console_name TEXT NOT NULL,
+    points_total INTEGER NOT NULL,
+    achievements_published INTEGER NOT NULL,
+    PRIMARY KEY (ulid, game_id)
+);
+
+CREATE TABLE active_claim (
+    id INTEGER NOT NULL PRIMARY KEY,
+    game_id INTEGER NOT NULL,
+    developer TEXT NOT NULL,
+    set_type INTEGER NOT NULL,
+    created INTEGER,
+    done_time INTEGER
+);
+
+CREATE INDEX active_claim_game ON active_claim(game_id);
+
+-- sync_state
+fetchedAt:
+SELECT fetched_at FROM sync_state WHERE resource = ?;
+
+markFetched:
+INSERT OR REPLACE INTO sync_state(resource, fetched_at) VALUES (?, ?);
+
+-- profile
+profile:
+SELECT * FROM user_profile WHERE ulid = ?;
+
+upsertProfile:
+INSERT OR REPLACE INTO user_profile VALUES ?;
+
+recentlyPlayed:
+SELECT * FROM recently_played WHERE ulid = ? ORDER BY position;
+
+deleteRecentlyPlayed:
+DELETE FROM recently_played WHERE ulid = ?;
+
+insertRecentlyPlayed:
+INSERT OR REPLACE INTO recently_played VALUES ?;
+
+awardSummary:
+SELECT * FROM user_award_summary WHERE ulid = ?;
+
+upsertAwardSummary:
+INSERT OR REPLACE INTO user_award_summary VALUES ?;
+
+-- games
+-- Two statements instead of UPSERT: minSdk 26 ships SQLite 3.18. Detail fields keep their
+-- cached value when a list endpoint does not carry them.
+insertGameIfMissing:
+INSERT OR IGNORE INTO game(id, title, console_id, console_name, image_icon) VALUES (?, ?, ?, ?, ?);
+
+updateGame:
+UPDATE game SET
+    title = :title,
+    console_id = :consoleId,
+    console_name = :consoleName,
+    image_icon = :imageIcon,
+    image_box_art = coalesce(:imageBoxArt, image_box_art),
+    publisher = coalesce(:publisher, publisher),
+    developer = coalesce(:developer, developer),
+    genre = coalesce(:genre, genre),
+    released = coalesce(:released, released),
+    num_players = coalesce(:numPlayers, num_players)
+WHERE id = :id;
+
+game:
+SELECT * FROM game WHERE id = ?;
+
+-- library
+library:
+SELECT g.id, g.title, g.console_id, g.console_name, g.image_icon,
+       p.max_possible, p.num_awarded, p.num_awarded_hardcore, p.most_recent_awarded, p.highest_award_kind
+FROM game_progress p JOIN game g ON g.id = p.game_id
+WHERE p.ulid = ?
+ORDER BY coalesce(p.most_recent_awarded, 0) DESC, g.title;
+
+deleteProgress:
+DELETE FROM game_progress WHERE ulid = ?;
+
+upsertProgress:
+INSERT OR REPLACE INTO game_progress VALUES ?;
+
+progressForGame:
+SELECT * FROM game_progress WHERE ulid = ? AND game_id = ?;
+
+-- achievements
+achievementsForGame:
+SELECT a.*, u.earned_at, u.earned_hardcore_at
+FROM achievement a LEFT JOIN achievement_unlock u ON u.achievement_id = a.id AND u.ulid = ?
+WHERE a.game_id = ?
+ORDER BY a.display_order, a.id;
+
+deleteAchievementsForGame:
+DELETE FROM achievement WHERE game_id = ?;
+
+insertAchievement:
+INSERT OR REPLACE INTO achievement VALUES ?;
+
+deleteUnlocksForGame:
+DELETE FROM achievement_unlock WHERE ulid = ? AND game_id = ?;
+
+insertUnlock:
+INSERT OR REPLACE INTO achievement_unlock VALUES ?;
+
+-- recent unlocks
+recentUnlocks:
+SELECT * FROM recent_unlock WHERE ulid = ? ORDER BY unlocked_at DESC LIMIT :limit;
+
+latestUnlockTime:
+SELECT max(unlocked_at) FROM recent_unlock WHERE ulid = ?;
+
+insertRecentUnlock:
+INSERT OR REPLACE INTO recent_unlock VALUES ?;
+
+-- wishlist
+wishlist:
+SELECT w.*, c.developer AS claim_developer, c.set_type AS claim_set_type, c.done_time AS claim_done_time
+FROM wishlist_entry w LEFT JOIN active_claim c ON c.id = (
+    SELECT id FROM active_claim WHERE game_id = w.game_id ORDER BY created DESC LIMIT 1
+)
+WHERE w.ulid = ?
+ORDER BY w.title;
+
+deleteWishlist:
+DELETE FROM wishlist_entry WHERE ulid = ?;
+
+insertWishlistEntry:
+INSERT OR REPLACE INTO wishlist_entry VALUES ?;
+
+deleteClaims:
+DELETE FROM active_claim;
+
+insertClaim:
+INSERT OR REPLACE INTO active_claim VALUES ?;
+
+-- sign-out
+clearAll {
+    DELETE FROM sync_state;
+    DELETE FROM user_profile;
+    DELETE FROM recently_played;
+    DELETE FROM user_award_summary;
+    DELETE FROM game;
+    DELETE FROM achievement;
+    DELETE FROM game_progress;
+    DELETE FROM achievement_unlock;
+    DELETE FROM recent_unlock;
+    DELETE FROM wishlist_entry;
+    DELETE FROM active_claim;
+}

@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -55,9 +56,17 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             // Serves the bundled demo account (DemoEngine).
             implementation(libs.ktor.client.mock)
+            implementation(libs.sqldelight.coroutines.extensions)
         }
         androidMain.dependencies {
             implementation(libs.koin.android)
+            implementation(libs.sqldelight.android.driver)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native.driver)
+        }
+        getByName("androidHostTest").dependencies {
+            implementation(libs.sqldelight.sqlite.driver)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -69,6 +78,14 @@ kotlin {
 
 dependencies {
     "androidRuntimeClasspath"(libs.compose.ui.tooling)
+}
+
+sqldelight {
+    databases {
+        create("BonusStageDatabase") {
+            packageName.set("net.bonysoft.bonusstage.db")
+        }
+    }
 }
 
 compose.resources {

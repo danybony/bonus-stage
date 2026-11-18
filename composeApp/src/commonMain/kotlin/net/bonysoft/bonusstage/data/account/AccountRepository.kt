@@ -53,7 +53,8 @@ class AccountRepository(
             } catch (_: Exception) {
                 null
             }
-            _session.value = stored?.let(Session::SignedIn) ?: Session.SignedOut
+            // A sign-in that finished first wins over the stored account.
+            _session.compareAndSet(Session.Loading, stored?.let(Session::SignedIn) ?: Session.SignedOut)
         }
     }
 
