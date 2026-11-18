@@ -73,6 +73,14 @@ class RetroAchievementsClient(
             "u" to user, "m" to minutes,
         )
 
+    /** Unlocks between two moments, as epoch seconds. Same entries as [getUserRecentAchievements]. */
+    suspend fun getAchievementsEarnedBetween(user: String, fromEpochSeconds: Long, toEpochSeconds: Long): List<RecentAchievement> =
+        call(
+            "API_GetAchievementsEarnedBetween",
+            ListSerializer(RecentAchievement.serializer()),
+            "u" to user, "f" to fromEpochSeconds, "t" to toEpochSeconds,
+        )
+
     suspend fun getUserWantToPlayList(user: String, count: Int = 500, offset: Int = 0): Page<WantToPlayGame> =
         call(
             "API_GetUserWantToPlayList",

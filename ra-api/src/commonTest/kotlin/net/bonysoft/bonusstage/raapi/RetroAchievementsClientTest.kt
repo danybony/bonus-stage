@@ -115,6 +115,15 @@ class RetroAchievementsClientTest {
     }
 
     @Test
+    fun earnedBetweenSendsTheRange() = runTest {
+        val unlocks = client(body = Fixtures.USER_RECENT_ACHIEVEMENTS).getAchievementsEarnedBetween("u", 1641054603, 1641659403)
+
+        assertEquals(2, unlocks.size)
+        assertEquals("1641054603", lastParams()["f"])
+        assertEquals("1641659403", lastParams()["t"])
+    }
+
+    @Test
     fun usersIFollowHasNoUserParameter() = runTest {
         val page = client(body = Fixtures.USERS_I_FOLLOW).getUsersIFollow(count = 50)
 

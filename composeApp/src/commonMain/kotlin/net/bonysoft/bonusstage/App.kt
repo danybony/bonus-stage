@@ -22,6 +22,7 @@ import net.bonysoft.bonusstage.data.account.Session
 import net.bonysoft.bonusstage.navigation.GameDetail
 import net.bonysoft.bonusstage.navigation.LibraryTab
 import net.bonysoft.bonusstage.navigation.ProfileTab
+import net.bonysoft.bonusstage.navigation.Recap
 import net.bonysoft.bonusstage.navigation.RecentTab
 import net.bonysoft.bonusstage.navigation.TopLevel
 import net.bonysoft.bonusstage.navigation.WishlistTab
@@ -38,6 +39,7 @@ import net.bonysoft.bonusstage.ui.game.GameDetailRoute
 import net.bonysoft.bonusstage.ui.library.LibraryRoute
 import net.bonysoft.bonusstage.ui.profile.ProfileRoute
 import net.bonysoft.bonusstage.ui.recent.RecentRoute
+import net.bonysoft.bonusstage.ui.share.RecapRoute
 import net.bonysoft.bonusstage.ui.signin.SignInRoute
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
 import net.bonysoft.bonusstage.ui.wishlist.WishlistRoute
@@ -73,10 +75,11 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
                 rememberViewModelStoreNavEntryDecorator(),
             ),
             entryProvider = entryProvider {
-                entry<ProfileTab> { ProfileRoute(onOpenGame = openGame) }
+                entry<ProfileTab> { ProfileRoute(onOpenGame = openGame, onOpenRecap = { backStack.add(Recap) }) }
                 entry<LibraryTab> { LibraryRoute(onOpenGame = openGame) }
                 entry<RecentTab> { RecentRoute(onOpenGame = openGame) }
                 entry<WishlistTab> { WishlistRoute(onOpenGame = openGame) }
+                entry<Recap> { RecapRoute(onBack = { backStack.removeLastOrNull() }) }
                 entry<GameDetail> { GameDetailRoute(gameId = it.gameId, onBack = { backStack.removeLastOrNull() }) }
             },
         )

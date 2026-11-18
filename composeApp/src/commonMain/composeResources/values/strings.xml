@@ -134,4 +134,20 @@
     <string name="friends_following">Following %1$s players · up to 20 refreshed at a time</string>
     <string name="friends_empty">You don't follow anyone yet. Follow players on retroachievements.org to see what they unlock.</string>
     <string name="friends_quiet">Nothing unlocked by the people you follow in the last three days.</string>
+
+    <string name="share_card">Share card</string>
+    <string name="share">Share</string>
+    <string name="share_preparing">Preparing…</string>
+    <string name="share_text_award">%1$s: %2$s on RetroAchievements</string>
+    <string name="share_text_recap">My %1$s on RetroAchievements</string>
+    <string name="card_achievements">ACHIEVEMENTS</string>
+    <string name="card_points">POINTS</string>
+    <string name="card_unlocks">UNLOCKS</string>
+    <string name="card_games">GAMES</string>
+    <string name="card_top_games">MOST PLAYED</string>
+    <string name="card_best">BEST UNLOCK</string>
+    <string name="card_quiet_month">A quiet month. Next one is yours!</string>
+    <string name="recap_title">Monthly recap</string>
+    <string name="recap_this_month">This month</string>
+    <string name="recap_last_month">Last month</string>
 </resources>

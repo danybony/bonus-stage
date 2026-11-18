@@ -54,6 +54,7 @@ class GameRepository(
                 released = game.released?.takeIf { it.isNotBlank() },
                 players = players?.toInt(),
                 award = Award.from(progress?.highest_award_kind),
+                awardedAt = progress?.highest_award_date?.let(Instant::fromEpochMilliseconds),
                 achievements = achievements.map {
                     AchievementModel(
                         id = it.id,

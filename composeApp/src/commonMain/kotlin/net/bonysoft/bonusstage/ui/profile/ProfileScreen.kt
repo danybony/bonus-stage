@@ -49,6 +49,7 @@ import net.bonysoft.bonusstage.resources.profile_softcore
 import net.bonysoft.bonusstage.resources.profile_title
 import net.bonysoft.bonusstage.resources.profile_true_points
 import net.bonysoft.bonusstage.resources.profile_unranked
+import net.bonysoft.bonusstage.resources.recap_title
 import net.bonysoft.bonusstage.resources.sign_out
 import net.bonysoft.bonusstage.resources.sign_out_text
 import net.bonysoft.bonusstage.resources.sign_out_title
@@ -74,12 +75,18 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Instant
 
 @Composable
-fun ProfileRoute(onOpenGame: (Long) -> Unit, modifier: Modifier = Modifier, viewModel: ProfileViewModel = koinViewModel()) {
+fun ProfileRoute(
+    onOpenGame: (Long) -> Unit,
+    onOpenRecap: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel = koinViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     ProfileScreen(
         state = state,
         onRefresh = viewModel::refresh,
         onOpenGame = onOpenGame,
+        onOpenRecap = onOpenRecap,
         onSignOut = viewModel::signOut,
         modifier = modifier,
     )
@@ -90,6 +97,7 @@ fun ProfileScreen(
     state: ProfileUiState,
     onRefresh: () -> Unit,
     onOpenGame: (Long) -> Unit,
+    onOpenRecap: () -> Unit,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -110,6 +118,7 @@ fun ProfileScreen(
                 }
                 item(key = "options") {
                     RetroWindow(title = stringResource(Res.string.profile_options), modifier = Modifier.fillMaxWidth()) {
+                        RetroMenuItem(text = stringResource(Res.string.recap_title), onClick = onOpenRecap)
                         RetroMenuItem(text = stringResource(Res.string.sign_out), onClick = { confirmSignOut = true })
                     }
                 }
@@ -260,7 +269,7 @@ private fun ProfileScreenPreview() {
                 isDemo = true,
                 status = RefreshStatus(),
             ),
-            onRefresh = {}, onOpenGame = {}, onSignOut = {},
+            onRefresh = {}, onOpenGame = {}, onOpenRecap = {}, onSignOut = {},
         )
     }
 }

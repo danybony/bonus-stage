@@ -210,6 +210,7 @@ object DemoData {
             }.toMap(),
             numAwardedToUser = game.unlocked.size, numAwardedToUserHardcore = game.unlocked.count { it.value.second },
             userTotalPlaytime = game.unlocked.size * 2_400L, highestAwardKind = game.award,
+            highestAwardDate = game.award?.let { iso(now() - game.unlocked.values.minOf { unlock -> unlock.first }) },
         )
     }
 
@@ -228,6 +229,12 @@ object DemoData {
             }
         }.sortedByDescending { it.date }
     }
+
+    fun earnedBetween(fromEpochSeconds: Long, toEpochSeconds: Long): List<RecentAchievement> =
+        recentAchievements(minutes = 60 * 24 * 365).filter {
+            val at = Instant.parse(it.date.replace(' ', 'T') + "Z").epochSeconds
+            at in fromEpochSeconds..toEpochSeconds
+        }
 
     fun wantToPlay() = Page(count = wishlist.size, total = wishlist.size, results = wishlist)
 

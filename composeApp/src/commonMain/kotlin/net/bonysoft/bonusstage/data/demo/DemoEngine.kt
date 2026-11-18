@@ -45,6 +45,10 @@ fun demoHttpClient(): HttpClient = HttpClient(
                 ListSerializer(RecentAchievement.serializer()),
                 DemoData.recentAchievementsOf(params["u"], params["m"]?.toIntOrNull() ?: 60),
             )
+            "API_GetAchievementsEarnedBetween" -> ok(
+                ListSerializer(RecentAchievement.serializer()),
+                DemoData.earnedBetween(params["f"]?.toLongOrNull() ?: 0, params["t"]?.toLongOrNull() ?: 0),
+            )
             "API_GetUserWantToPlayList" -> ok(Page.serializer(WantToPlayGame.serializer()), DemoData.wantToPlay())
             "API_GetUsersIFollow" -> ok(Page.serializer(FollowedUser.serializer()), DemoData.following())
             "API_GetActiveClaims" -> ok(ListSerializer(ActiveClaim.serializer()), DemoData.activeClaims())

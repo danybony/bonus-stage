@@ -16,6 +16,7 @@ import net.bonysoft.bonusstage.data.repository.FriendsRepository
 import net.bonysoft.bonusstage.data.repository.GameRepository
 import net.bonysoft.bonusstage.data.repository.LibraryRepository
 import net.bonysoft.bonusstage.data.repository.ProfileRepository
+import net.bonysoft.bonusstage.data.repository.RecapRepository
 import net.bonysoft.bonusstage.data.repository.RecentAchievementsRepository
 import net.bonysoft.bonusstage.data.repository.SettingsRepository
 import net.bonysoft.bonusstage.data.repository.WishlistRepository
@@ -25,6 +26,7 @@ import net.bonysoft.bonusstage.ui.library.LibraryViewModel
 import net.bonysoft.bonusstage.ui.profile.ProfileViewModel
 import net.bonysoft.bonusstage.ui.recent.FriendsViewModel
 import net.bonysoft.bonusstage.ui.recent.RecentViewModel
+import net.bonysoft.bonusstage.ui.share.RecapViewModel
 import net.bonysoft.bonusstage.ui.signin.SignInViewModel
 import net.bonysoft.bonusstage.ui.wishlist.WishlistViewModel
 import org.koin.core.KoinApplication
@@ -56,6 +58,7 @@ val dataModule = module {
     single { WishlistRepository(get(), get(), get(), get()) }
     single { SettingsRepository(get()) }
     single { FriendsRepository(get(), get(), get(), get()) }
+    single { RecapRepository(get()) }
     single { WishlistAlertChecker(get(), get(), get()) }
     single(createdAtStart = true) { BackgroundCheckCoordinator(get(), get(), get()) }
     single { WidgetDataSource(get(), get(), get()) }
@@ -68,8 +71,9 @@ val uiModule = module {
     viewModelOf(::LibraryViewModel)
     viewModelOf(::RecentViewModel)
     viewModelOf(::FriendsViewModel)
+    viewModelOf(::RecapViewModel)
     viewModelOf(::WishlistViewModel)
-    viewModel { (gameId: Long) -> GameDetailViewModel(gameId, get(), get()) }
+    viewModel { (gameId: Long) -> GameDetailViewModel(gameId, get(), get(), get()) }
 }
 
 val appModules = listOf(platformModule, dataModule, uiModule)
