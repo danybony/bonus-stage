@@ -14,6 +14,7 @@ import net.bonysoft.bonusstage.raapi.model.AchievementOfTheWeek
 import net.bonysoft.bonusstage.raapi.model.ActiveClaim
 import net.bonysoft.bonusstage.raapi.model.Console
 import net.bonysoft.bonusstage.raapi.model.FollowedUser
+import net.bonysoft.bonusstage.raapi.model.Follower
 import net.bonysoft.bonusstage.raapi.model.GameInfoAndUserProgress
 import net.bonysoft.bonusstage.raapi.model.GameListEntry
 import net.bonysoft.bonusstage.raapi.model.GameProgress
@@ -35,7 +36,8 @@ fun demoHttpClient(): HttpClient = HttpClient(
             headers = headersOf(HttpHeaders.ContentType, "application/json"),
         )
         when (endpoint) {
-            "API_GetUserProfile" -> ok(UserProfile.serializer(), DemoData.profile())
+            "API_GetUserProfile" -> DemoData.profileOf(params["u"])?.let { ok(UserProfile.serializer(), it) }
+                ?: respondError(HttpStatusCode.NotFound)
             "API_GetUserSummary" -> ok(UserSummary.serializer(), DemoData.summary())
             "API_GetUserCompletionProgress" -> ok(Page.serializer(GameProgress.serializer()), DemoData.completionProgress())
             "API_GetGameInfoAndUserProgress" -> DemoData.gameInfo(params["g"]?.toLongOrNull() ?: -1)
@@ -50,6 +52,7 @@ fun demoHttpClient(): HttpClient = HttpClient(
                 DemoData.earnedBetween(params["f"]?.toLongOrNull() ?: 0, params["t"]?.toLongOrNull() ?: 0),
             )
             "API_GetUserWantToPlayList" -> ok(Page.serializer(WantToPlayGame.serializer()), DemoData.wantToPlay())
+            "API_GetUsersFollowingMe" -> ok(Page.serializer(Follower.serializer()), DemoData.followers())
             "API_GetUsersIFollow" -> ok(Page.serializer(FollowedUser.serializer()), DemoData.following())
             "API_GetActiveClaims" -> ok(ListSerializer(ActiveClaim.serializer()), DemoData.activeClaims())
             "API_GetUserAwards" -> ok(UserAwards.serializer(), DemoData.awards())

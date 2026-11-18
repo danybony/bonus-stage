@@ -23,6 +23,7 @@ import net.bonysoft.bonusstage.data.repository.SettingsRepository
 import net.bonysoft.bonusstage.data.repository.WishlistRepository
 import net.bonysoft.bonusstage.data.rom.RomScanRepository
 import net.bonysoft.bonusstage.db.BonusStageDatabase
+import net.bonysoft.bonusstage.ui.friends.FriendsListViewModel
 import net.bonysoft.bonusstage.ui.game.GameDetailViewModel
 import net.bonysoft.bonusstage.ui.library.LibraryViewModel
 import net.bonysoft.bonusstage.ui.profile.ProfileViewModel
@@ -81,6 +82,7 @@ val uiModule = module {
     viewModelOf(::RecapViewModel)
     viewModelOf(::RomScanViewModel)
     viewModelOf(::GameSearchViewModel)
+    viewModelOf(::FriendsListViewModel)
     viewModelOf(::WishlistViewModel)
     viewModel { (gameId: Long) -> GameDetailViewModel(gameId, get(), get(), get()) }
 }

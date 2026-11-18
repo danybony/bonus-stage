@@ -24,6 +24,7 @@ import androidx.navigation3.ui.NavDisplay
 import net.bonysoft.bonusstage.data.account.AccountRepository
 import net.bonysoft.bonusstage.data.account.Session
 import net.bonysoft.bonusstage.data.repository.SettingsRepository
+import net.bonysoft.bonusstage.navigation.FriendsList
 import net.bonysoft.bonusstage.navigation.GameDetail
 import net.bonysoft.bonusstage.navigation.GameSearch
 import net.bonysoft.bonusstage.navigation.LibraryTab
@@ -47,6 +48,7 @@ import net.bonysoft.bonusstage.ui.components.RetroTab
 import net.bonysoft.bonusstage.ui.components.RetroTabBar
 import net.bonysoft.bonusstage.ui.effects.ScreenEffect
 import net.bonysoft.bonusstage.ui.effects.screenEffect
+import net.bonysoft.bonusstage.ui.friends.FriendsListRoute
 import net.bonysoft.bonusstage.ui.game.GameDetailRoute
 import net.bonysoft.bonusstage.ui.library.LibraryRoute
 import net.bonysoft.bonusstage.ui.profile.ProfileRoute
@@ -108,10 +110,13 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
                 rememberViewModelStoreNavEntryDecorator(),
             ),
             entryProvider = entryProvider {
-                entry<ProfileTab> { ProfileRoute(onOpenGame = openGame, onOpenRecap = { backStack.add(Recap) }) }
+                entry<ProfileTab> {
+                    ProfileRoute(onOpenGame = openGame, onOpenRecap = { backStack.add(Recap) }, onOpenFriends = { backStack.add(FriendsList) })
+                }
                 entry<LibraryTab> { LibraryRoute(onOpenGame = openGame, onScanRoms = { backStack.add(RomScan) }) }
-                entry<RecentTab> { RecentRoute(onOpenGame = openGame) }
+                entry<RecentTab> { RecentRoute(onOpenGame = openGame, onManageFriends = { backStack.add(FriendsList) }) }
                 entry<WishlistTab> { WishlistRoute(onOpenGame = openGame, onSearch = { backStack.add(GameSearch) }) }
+                entry<FriendsList> { FriendsListRoute(onBack = { backStack.removeLastOrNull() }) }
                 entry<GameSearch> { GameSearchRoute(onBack = { backStack.removeLastOrNull() }) }
                 entry<RomScan> { RomScanRoute(onBack = { backStack.removeLastOrNull() }, onOpenGame = openGame) }
                 entry<Recap> { RecapRoute(onBack = { backStack.removeLastOrNull() }) }

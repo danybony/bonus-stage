@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.items
@@ -20,6 +21,7 @@ import androidx.compose.runtime.setValue
 import net.bonysoft.bonusstage.domain.FriendUnlock
 import net.bonysoft.bonusstage.resources.feed_friends
 import net.bonysoft.bonusstage.resources.feed_mine
+import net.bonysoft.bonusstage.resources.friends_manage
 import net.bonysoft.bonusstage.resources.friends_empty
 import net.bonysoft.bonusstage.resources.friends_following
 import net.bonysoft.bonusstage.resources.friends_quiet
@@ -64,16 +66,20 @@ import kotlin.time.Clock
 enum class Feed { Mine, Friends }
 
 @Composable
-fun RecentRoute(onOpenGame: (Long) -> Unit, modifier: Modifier = Modifier) {
+fun RecentRoute(onOpenGame: (Long) -> Unit, onManageFriends: () -> Unit, modifier: Modifier = Modifier) {
     var feed by rememberSaveable { mutableStateOf(Feed.Mine) }
     RetroScaffold(title = stringResource(Res.string.recent_title), modifier = modifier) {
         Column {
             Row(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 RetroChip(stringResource(Res.string.feed_mine), selected = feed == Feed.Mine, onClick = { feed = Feed.Mine })
                 RetroChip(stringResource(Res.string.feed_friends), selected = feed == Feed.Friends, onClick = { feed = Feed.Friends })
+                if (feed == Feed.Friends) {
+                    Spacer(Modifier.weight(1f))
+                    RetroChip(stringResource(Res.string.friends_manage), selected = false, onClick = onManageFriends)
+                }
             }
             when (feed) {
                 Feed.Mine -> {

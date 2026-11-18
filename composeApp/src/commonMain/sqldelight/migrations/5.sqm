@@ -1,0 +1,9 @@
+-- Version 5 to 6: the people who follow the user.
+CREATE TABLE follower (
+    owner_ulid TEXT NOT NULL,
+    ulid TEXT NOT NULL,
+    username TEXT NOT NULL,
+    points INTEGER NOT NULL,
+    i_follow INTEGER NOT NULL,
+    PRIMARY KEY (owner_ulid, ulid)
+);
