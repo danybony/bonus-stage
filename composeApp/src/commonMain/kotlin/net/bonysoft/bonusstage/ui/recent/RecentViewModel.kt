@@ -8,12 +8,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.TimeZone
 import net.bonysoft.bonusstage.data.repository.RecentAchievementsRepository
+import net.bonysoft.bonusstage.domain.RecentUnlock
 import net.bonysoft.bonusstage.ui.common.RefreshController
 import net.bonysoft.bonusstage.ui.common.RefreshStatus
 
 data class RecentUiState(
     /** Null until fetched once. */
-    val days: List<UnlockDay>? = null,
+    val days: List<Day<RecentUnlock>>? = null,
     val status: RefreshStatus = RefreshStatus(isRefreshing = true),
 )
 
@@ -23,7 +24,7 @@ class RecentViewModel(private val repository: RecentAchievementsRepository) : Vi
 
     val state: StateFlow<RecentUiState> = combine(repository.observeRecent(), refresher.status) { unlocks, status ->
         RecentUiState(
-            days = unlocks.takeIf { it.isNotEmpty() || repository.hasBeenFetched() }?.groupByDay(TimeZone.currentSystemDefault()),
+            days = unlocks.takeIf { it.isNotEmpty() || repository.hasBeenFetched() }?.groupByDay(TimeZone.currentSystemDefault()) { it.unlockedAt },
             status = status,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RecentUiState())

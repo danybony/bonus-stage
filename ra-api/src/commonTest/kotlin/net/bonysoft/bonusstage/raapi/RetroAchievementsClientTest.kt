@@ -115,6 +115,16 @@ class RetroAchievementsClientTest {
     }
 
     @Test
+    fun usersIFollowHasNoUserParameter() = runTest {
+        val page = client(body = Fixtures.USERS_I_FOLLOW).getUsersIFollow(count = 50)
+
+        assertEquals(listOf("zuliman92", "Scott"), page.results.map { it.user })
+        assertTrue(page.results[0].isFollowingMe)
+        assertNull(lastParams()["u"])
+        assertEquals("50", lastParams()["c"])
+    }
+
+    @Test
     fun unauthorizedResponseMapsToUnauthorized() = runTest {
         assertFailsWith<RaApiException.Unauthorized> {
             client(HttpStatusCode.Unauthorized, body = """{"message":"Unauthenticated."}""").getUserProfile("u")

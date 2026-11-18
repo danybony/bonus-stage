@@ -376,4 +376,15 @@ object Fixtures {
   "UnlocksHardcoreCount": 268
 }
 """
+
+    const val USERS_I_FOLLOW = """
+{
+  "Count": 2,
+  "Total": 2,
+  "Results": [
+    {"User": "zuliman92", "ULID": "00003EMFWR7XB8SDPEHB3K56ZQ", "Points": 1882, "PointsSoftcore": 258, "IsFollowingMe": true},
+    {"User": "Scott", "ULID": "00003EMFWR7XB8SDPEHB3K56ZR", "Points": 51000, "PointsSoftcore": 0, "IsFollowingMe": false}
+  ]
+}
+"""
 }

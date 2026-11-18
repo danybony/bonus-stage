@@ -13,6 +13,7 @@ import net.bonysoft.bonusstage.raapi.RaJson
 import net.bonysoft.bonusstage.raapi.model.AchievementOfTheWeek
 import net.bonysoft.bonusstage.raapi.model.ActiveClaim
 import net.bonysoft.bonusstage.raapi.model.Console
+import net.bonysoft.bonusstage.raapi.model.FollowedUser
 import net.bonysoft.bonusstage.raapi.model.GameInfoAndUserProgress
 import net.bonysoft.bonusstage.raapi.model.GameListEntry
 import net.bonysoft.bonusstage.raapi.model.GameProgress
@@ -42,9 +43,10 @@ fun demoHttpClient(): HttpClient = HttpClient(
                 ?: respondError(HttpStatusCode.NotFound)
             "API_GetUserRecentAchievements" -> ok(
                 ListSerializer(RecentAchievement.serializer()),
-                DemoData.recentAchievements(params["m"]?.toIntOrNull() ?: 60),
+                DemoData.recentAchievementsOf(params["u"], params["m"]?.toIntOrNull() ?: 60),
             )
             "API_GetUserWantToPlayList" -> ok(Page.serializer(WantToPlayGame.serializer()), DemoData.wantToPlay())
+            "API_GetUsersIFollow" -> ok(Page.serializer(FollowedUser.serializer()), DemoData.following())
             "API_GetActiveClaims" -> ok(ListSerializer(ActiveClaim.serializer()), DemoData.activeClaims())
             "API_GetUserAwards" -> ok(UserAwards.serializer(), DemoData.awards())
             "API_GetConsoleIDs" -> ok(ListSerializer(Console.serializer()), DemoData.consoles())

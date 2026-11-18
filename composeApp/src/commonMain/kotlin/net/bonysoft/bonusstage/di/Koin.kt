@@ -12,6 +12,7 @@ import net.bonysoft.bonusstage.data.widget.WidgetDataSource
 import net.bonysoft.bonusstage.data.widget.WidgetSync
 import net.bonysoft.bonusstage.data.cache.Refresher
 import net.bonysoft.bonusstage.data.repository.CacheCleaner
+import net.bonysoft.bonusstage.data.repository.FriendsRepository
 import net.bonysoft.bonusstage.data.repository.GameRepository
 import net.bonysoft.bonusstage.data.repository.LibraryRepository
 import net.bonysoft.bonusstage.data.repository.ProfileRepository
@@ -22,6 +23,7 @@ import net.bonysoft.bonusstage.db.BonusStageDatabase
 import net.bonysoft.bonusstage.ui.game.GameDetailViewModel
 import net.bonysoft.bonusstage.ui.library.LibraryViewModel
 import net.bonysoft.bonusstage.ui.profile.ProfileViewModel
+import net.bonysoft.bonusstage.ui.recent.FriendsViewModel
 import net.bonysoft.bonusstage.ui.recent.RecentViewModel
 import net.bonysoft.bonusstage.ui.signin.SignInViewModel
 import net.bonysoft.bonusstage.ui.wishlist.WishlistViewModel
@@ -53,6 +55,7 @@ val dataModule = module {
     single { RecentAchievementsRepository(get(), get(), get(), get()) }
     single { WishlistRepository(get(), get(), get(), get()) }
     single { SettingsRepository(get()) }
+    single { FriendsRepository(get(), get(), get(), get()) }
     single { WishlistAlertChecker(get(), get(), get()) }
     single(createdAtStart = true) { BackgroundCheckCoordinator(get(), get(), get()) }
     single { WidgetDataSource(get(), get(), get()) }
@@ -64,6 +67,7 @@ val uiModule = module {
     viewModelOf(::ProfileViewModel)
     viewModelOf(::LibraryViewModel)
     viewModelOf(::RecentViewModel)
+    viewModelOf(::FriendsViewModel)
     viewModelOf(::WishlistViewModel)
     viewModel { (gameId: Long) -> GameDetailViewModel(gameId, get(), get()) }
 }

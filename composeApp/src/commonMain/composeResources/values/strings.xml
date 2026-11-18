@@ -128,4 +128,10 @@
     <string name="notification_in_development_text">%1$s is making achievements for this game.</string>
     <string name="notification_published_title">New set: %1$s</string>
     <string name="notification_published_text">%1$s achievements are live. Time to play!</string>
+
+    <string name="feed_mine">Mine</string>
+    <string name="feed_friends">Friends</string>
+    <string name="friends_following">Following %1$s players · up to 20 refreshed at a time</string>
+    <string name="friends_empty">You don't follow anyone yet. Follow players on retroachievements.org to see what they unlock.</string>
+    <string name="friends_quiet">Nothing unlocked by the people you follow in the last three days.</string>
 </resources>

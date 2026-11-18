@@ -1,0 +1,25 @@
+-- Version 2 to 3: friends feed.
+CREATE TABLE followed_user (
+    owner_ulid TEXT NOT NULL,
+    ulid TEXT NOT NULL,
+    username TEXT NOT NULL,
+    points INTEGER NOT NULL,
+    follows_me INTEGER NOT NULL,
+    PRIMARY KEY (owner_ulid, ulid)
+);
+
+CREATE TABLE friend_unlock (
+    owner_ulid TEXT NOT NULL,
+    friend_ulid TEXT NOT NULL,
+    achievement_id INTEGER NOT NULL,
+    unlocked_at INTEGER NOT NULL,
+    hardcore INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    badge_name TEXT NOT NULL,
+    points INTEGER NOT NULL,
+    game_id INTEGER NOT NULL,
+    game_title TEXT NOT NULL,
+    game_icon TEXT NOT NULL,
+    PRIMARY KEY (owner_ulid, friend_ulid, achievement_id)
+);

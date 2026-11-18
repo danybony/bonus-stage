@@ -138,3 +138,19 @@ data class WishlistGame(
     val consoleName: String,
     val status: SetStatus,
 )
+
+data class FriendUnlock(
+    val friendUlid: String,
+    val friendName: String,
+    val friendAvatarUrl: String,
+    val achievementId: Long,
+    val title: String,
+    val description: String,
+    val points: Int,
+    val badgeUrl: String,
+    val hardcore: Boolean,
+    val unlockedAt: Instant,
+    val gameId: Long,
+    val gameTitle: String,
+    val gameIconUrl: String,
+)

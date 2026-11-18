@@ -134,6 +134,32 @@ CREATE TABLE active_claim (
 
 CREATE INDEX active_claim_game ON active_claim(game_id);
 
+-- People the user follows and their recent unlocks (friends feed).
+CREATE TABLE followed_user (
+    owner_ulid TEXT NOT NULL,
+    ulid TEXT NOT NULL,
+    username TEXT NOT NULL,
+    points INTEGER NOT NULL,
+    follows_me INTEGER NOT NULL,
+    PRIMARY KEY (owner_ulid, ulid)
+);
+
+CREATE TABLE friend_unlock (
+    owner_ulid TEXT NOT NULL,
+    friend_ulid TEXT NOT NULL,
+    achievement_id INTEGER NOT NULL,
+    unlocked_at INTEGER NOT NULL,
+    hardcore INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    badge_name TEXT NOT NULL,
+    points INTEGER NOT NULL,
+    game_id INTEGER NOT NULL,
+    game_title TEXT NOT NULL,
+    game_icon TEXT NOT NULL,
+    PRIMARY KEY (owner_ulid, friend_ulid, achievement_id)
+);
+
 -- sync_state
 fetchedAt:
 SELECT fetched_at FROM sync_state WHERE resource = ?;
@@ -253,8 +279,34 @@ DELETE FROM active_claim;
 insertClaim:
 INSERT OR REPLACE INTO active_claim VALUES ?;
 
+-- friends
+followedUsers:
+SELECT * FROM followed_user WHERE owner_ulid = ? ORDER BY username COLLATE NOCASE;
+
+deleteFollowedUsers:
+DELETE FROM followed_user WHERE owner_ulid = ?;
+
+insertFollowedUser:
+INSERT OR REPLACE INTO followed_user VALUES ?;
+
+-- Drops unlocks of people no longer followed.
+deleteUnfollowedUnlocks:
+DELETE FROM friend_unlock WHERE owner_ulid = :owner AND friend_ulid NOT IN (SELECT ulid FROM followed_user WHERE owner_ulid = :owner);
+
+insertFriendUnlock:
+INSERT OR REPLACE INTO friend_unlock VALUES ?;
+
+friendFeed:
+SELECT u.*, f.username
+FROM friend_unlock u JOIN followed_user f ON f.ulid = u.friend_ulid AND f.owner_ulid = u.owner_ulid
+WHERE u.owner_ulid = ?
+ORDER BY u.unlocked_at DESC
+LIMIT :limit;
+
 -- sign-out
 clearAll {
+    DELETE FROM followed_user;
+    DELETE FROM friend_unlock;
     DELETE FROM sync_state;
     DELETE FROM user_profile;
     DELETE FROM recently_played;
