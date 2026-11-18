@@ -1,0 +1,82 @@
+name: API contract
+
+# ADR 0003: catch breaking changes in the RetroAchievements Web API within a day.
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+    inputs:
+      update_snapshots:
+        description: 'Rewrite the schema snapshots and upload them as an artifact'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  contract:
+    name: Check the live API
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Run the contract check
+        id: check
+        env:
+          RA_USERNAME: ${{ secrets.RA_USERNAME }}
+          RA_API_KEY: ${{ secrets.RA_API_KEY }}
+          RA_UPDATE_SNAPSHOTS: ${{ inputs.update_snapshots && 'true' || 'false' }}
+        run: ./gradlew :ra-api:jvmContractTest
+
+      - name: Report new commits in the API docs
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          since=$(date -u -d '25 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+          commits=$(gh api "repos/RetroAchievements/api-docs/commits?since=$since" \
+            --jq '.[] | "- [\(.sha[0:7])](\(.html_url)) \(.commit.message | split("\n")[0])"')
+          {
+            cat ra-api/build/contract/report.md 2>/dev/null || echo "No report produced."
+            echo
+            echo "## API docs commits in the last 25 hours"
+            echo "${commits:-None.}"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$commits" ]; then
+            echo "::warning title=API docs changed::New commits in RetroAchievements/api-docs, check the job summary"
+          fi
+
+      - name: Upload generated snapshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: contract-snapshots
+          path: ra-api/build/contract/
+          if-no-files-found: ignore
+
+      - name: Open or update the API issue
+        if: failure() && steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="RetroAchievements API contract check failed"
+          body_file=$(mktemp)
+          {
+            echo "The daily contract check failed: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo
+            cat ra-api/build/contract/report.md 2>/dev/null || echo "No report produced, see the run log."
+          } > "$body_file"
+          existing=$(gh issue list --label api --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file "$body_file"
+          else
+            gh issue create --title "$title" --label api --body-file "$body_file"
+          fi
