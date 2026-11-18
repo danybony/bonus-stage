@@ -5,6 +5,7 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import net.bonysoft.bonusstage.ui.transitions.GameOrigin
 
 /** The four tabs of the bottom bar. Selecting one resets the back stack to it. */
 @Serializable
@@ -23,7 +24,7 @@ data object RecentTab : TopLevel
 data object WishlistTab : TopLevel
 
 @Serializable
-data class GameDetail(val gameId: Long) : NavKey
+data class GameDetail(val gameId: Long, val origin: GameOrigin = GameOrigin.Other) : NavKey
 
 @Serializable
 data object Recap : NavKey

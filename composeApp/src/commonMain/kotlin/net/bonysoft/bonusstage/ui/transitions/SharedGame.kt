@@ -8,9 +8,17 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import kotlinx.serialization.Serializable
 
 /** The parts of a game that move from a list row to the game screen. */
-enum class GamePart { Icon, Title, Console }
+enum class GamePart { Icon, Title, Console, Tag, Award }
+
+/**
+ * Where a game was opened from. Part of the shared element keys, so the game screen animates only
+ * with the list that opened it: switching tabs between two lists showing the same game must not.
+ */
+@Serializable
+enum class GameOrigin { Library, Profile, Wishlist, Other }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 private val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?> { null }
@@ -27,17 +35,19 @@ fun SharedGameTransitions(modifier: Modifier = Modifier, content: @Composable ()
 }
 
 /**
- * Tags a game's icon, title or console so it moves between screens when the game is opened.
- * Text is scaled rather than re-laid out, so title styles can differ between the two screens.
- * A no-op outside SharedGameTransitions or a navigation entry (previews, dialogs, cards).
+ * Tags a part of a game so it moves between the list that opened the game ([origin]) and the game
+ * screen. Text is scaled rather than re-laid out, so styles can differ between the two screens.
+ * A no-op for [GameOrigin.Other] and outside SharedGameTransitions or a navigation entry
+ * (previews, dialogs, cards).
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun Modifier.sharedGame(gameId: Long, part: GamePart): Modifier {
+fun Modifier.sharedGame(gameId: Long, part: GamePart, origin: GameOrigin): Modifier {
+    if (origin == GameOrigin.Other) return this
     val transitions = LocalSharedTransitionScope.current ?: return this
     val entryScope = LocalNavAnimatedContentScope.current
     return with(transitions) {
-        val state = rememberSharedContentState(key = "game-$gameId-${part.name}")
+        val state = rememberSharedContentState(key = "game-$gameId-${part.name}-${origin.name}")
         if (part == GamePart.Icon) {
             this@sharedGame.sharedElement(state, animatedVisibilityScope = entryScope)
         } else {

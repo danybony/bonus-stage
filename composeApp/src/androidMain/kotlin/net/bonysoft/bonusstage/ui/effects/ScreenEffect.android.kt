@@ -21,6 +21,7 @@ private fun Modifier.shaderEffect(effect: ScreenEffect): Modifier {
     return graphicsLayer {
         shader.setFloatUniform("resolution", size.width, size.height)
         shader.setFloatUniform("mode", effect.shaderMode())
+        shader.setFloatUniform("scale", density)
         renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "content").asComposeRenderEffect()
     }
 }

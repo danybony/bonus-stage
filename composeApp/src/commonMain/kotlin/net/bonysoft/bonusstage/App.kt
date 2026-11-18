@@ -58,6 +58,7 @@ import net.bonysoft.bonusstage.ui.search.GameSearchRoute
 import net.bonysoft.bonusstage.ui.share.RecapRoute
 import net.bonysoft.bonusstage.ui.signin.SignInRoute
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
+import net.bonysoft.bonusstage.ui.transitions.GameOrigin
 import net.bonysoft.bonusstage.ui.transitions.SharedGameTransitions
 import net.bonysoft.bonusstage.ui.wishlist.WishlistRoute
 import org.jetbrains.compose.resources.stringResource
@@ -99,7 +100,7 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
     // Movable, so switching between rail and bottom bar (rotation, unfolding) keeps every screen's state.
     val content = remember(backStack) {
         movableContentOf { contentModifier: Modifier ->
-        val openGame: (Long) -> Unit = { backStack.add(GameDetail(it)) }
+        val openGame = { origin: GameOrigin -> { gameId: Long -> backStack.add(GameDetail(gameId, origin)); Unit } }
         SharedGameTransitions(contentModifier) {
         NavDisplay(
             backStack = backStack,
@@ -111,16 +112,16 @@ private fun SignedInApp(modifier: Modifier = Modifier) {
             ),
             entryProvider = entryProvider {
                 entry<ProfileTab> {
-                    ProfileRoute(onOpenGame = openGame, onOpenRecap = { backStack.add(Recap) }, onOpenFriends = { backStack.add(FriendsList) })
+                    ProfileRoute(onOpenGame = openGame(GameOrigin.Profile), onOpenRecap = { backStack.add(Recap) }, onOpenFriends = { backStack.add(FriendsList) })
                 }
-                entry<LibraryTab> { LibraryRoute(onOpenGame = openGame, onScanRoms = { backStack.add(RomScan) }) }
-                entry<RecentTab> { RecentRoute(onOpenGame = openGame, onManageFriends = { backStack.add(FriendsList) }) }
-                entry<WishlistTab> { WishlistRoute(onOpenGame = openGame, onSearch = { backStack.add(GameSearch) }) }
+                entry<LibraryTab> { LibraryRoute(onOpenGame = openGame(GameOrigin.Library), onScanRoms = { backStack.add(RomScan) }) }
+                entry<RecentTab> { RecentRoute(onOpenGame = openGame(GameOrigin.Other), onManageFriends = { backStack.add(FriendsList) }) }
+                entry<WishlistTab> { WishlistRoute(onOpenGame = openGame(GameOrigin.Wishlist), onSearch = { backStack.add(GameSearch) }) }
                 entry<FriendsList> { FriendsListRoute(onBack = { backStack.removeLastOrNull() }) }
                 entry<GameSearch> { GameSearchRoute(onBack = { backStack.removeLastOrNull() }) }
-                entry<RomScan> { RomScanRoute(onBack = { backStack.removeLastOrNull() }, onOpenGame = openGame) }
+                entry<RomScan> { RomScanRoute(onBack = { backStack.removeLastOrNull() }, onOpenGame = openGame(GameOrigin.Other)) }
                 entry<Recap> { RecapRoute(onBack = { backStack.removeLastOrNull() }) }
-                entry<GameDetail> { GameDetailRoute(gameId = it.gameId, onBack = { backStack.removeLastOrNull() }) }
+                entry<GameDetail> { GameDetailRoute(gameId = it.gameId, origin = it.origin, onBack = { backStack.removeLastOrNull() }) }
             },
         )
         }

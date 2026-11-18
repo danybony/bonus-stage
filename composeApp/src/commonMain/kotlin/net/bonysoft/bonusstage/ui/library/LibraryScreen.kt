@@ -1,5 +1,6 @@
 package net.bonysoft.bonusstage.ui.library
 
+import net.bonysoft.bonusstage.ui.transitions.GameOrigin
 import net.bonysoft.bonusstage.ui.transitions.GamePart
 import net.bonysoft.bonusstage.ui.transitions.sharedGame
 import net.bonysoft.bonusstage.ui.adaptive.AdaptiveList
@@ -190,7 +191,7 @@ internal fun GameRow(game: LibraryGame, onClick: () -> Unit, modifier: Modifier 
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 64.dp, modifier = Modifier.sharedGame(game.id, GamePart.Icon))
+        RetroBadge(imageUrl = game.iconUrl, contentDescription = null, size = 64.dp, modifier = Modifier.sharedGame(game.id, GamePart.Icon, GameOrigin.Library))
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 title,
@@ -198,19 +199,19 @@ internal fun GameRow(game: LibraryGame, onClick: () -> Unit, modifier: Modifier 
                 color = colors.onWindow,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.sharedGame(game.id, GamePart.Title),
+                modifier = Modifier.sharedGame(game.id, GamePart.Title, GameOrigin.Library),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (tag != null) RetroTag(tag.uppercase(), colors.onWindowMuted)
+                if (tag != null) RetroTag(tag.uppercase(), colors.onWindowMuted, Modifier.sharedGame(game.id, GamePart.Tag, GameOrigin.Library))
                 Text(
                     game.consoleName,
                     style = RetroTheme.typography.label,
                     color = colors.onWindowMuted,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false).sharedGame(game.id, GamePart.Console),
+                    modifier = Modifier.weight(1f, fill = false).sharedGame(game.id, GamePart.Console, GameOrigin.Library),
                 )
-                game.award?.let { AwardTag(it) }
+                game.award?.let { AwardTag(it, Modifier.sharedGame(game.id, GamePart.Award, GameOrigin.Library)) }
             }
             if (game.achievementsTotal > 0) {
                 RetroProgressBar(progress = game.progress, color = game.award?.color(colors) ?: colors.progress, height = 12.dp)

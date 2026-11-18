@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Android 11+ package visibility: without these the app cannot see which browser supports
+         Custom Tabs (WebOpener), and every link falls back to the external browser. -->
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
     <application>
         <receiver
             android:name="net.bonysoft.bonusstage.widget.BonusStageWidgetReceiver"
