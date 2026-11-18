@@ -1,0 +1,44 @@
+name: iOS
+
+# macOS minutes cost ten times Linux ones on private repositories,
+# so pull requests run this only when they touch code that ends up in the iOS app.
+on:
+  pull_request:
+    paths:
+      - 'iosApp/**'
+      - '**/commonMain/**'
+      - '**/iosMain/**'
+      - 'gradle/**'
+      - '**/*.gradle.kts'
+      - 'gradle.properties'
+      - '.github/workflows/ios.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    name: iOS build and tests
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Kotlin tests on the iOS simulator
+        run: ./gradlew :composeApp:iosSimulatorArm64Test :ra-api:iosSimulatorArm64Test
+      - name: Build the iOS app for the simulator
+        run: >
+          xcodebuild build
+          -project iosApp/iosApp.xcodeproj
+          -scheme iosApp
+          -configuration Debug
+          -destination 'generic/platform=iOS Simulator'
+          CODE_SIGNING_ALLOWED=NO
