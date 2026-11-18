@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import net.bonysoft.bonusstage.data.account.AccountRepository
 import net.bonysoft.bonusstage.data.repository.GameRepository
 import net.bonysoft.bonusstage.data.repository.SettingsRepository
 import net.bonysoft.bonusstage.domain.GameDetail
@@ -16,6 +17,7 @@ import net.bonysoft.bonusstage.ui.common.RefreshStatus
 data class GameDetailUiState(
     val game: GameDetail? = null,
     val hideSpoilers: Boolean = true,
+    val username: String = "",
     val status: RefreshStatus = RefreshStatus(isRefreshing = true),
 )
 
@@ -23,6 +25,7 @@ class GameDetailViewModel(
     private val gameId: Long,
     private val games: GameRepository,
     private val settings: SettingsRepository,
+    private val accounts: AccountRepository,
 ) : ViewModel() {
 
     private val refresher = RefreshController(viewModelScope)
@@ -32,7 +35,7 @@ class GameDetailViewModel(
         settings.hideSpoilers,
         refresher.status,
     ) { game, hideSpoilers, status ->
-        GameDetailUiState(game, hideSpoilers, status)
+        GameDetailUiState(game, hideSpoilers, accounts.currentAccount?.username.orEmpty(), status)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), GameDetailUiState())
 
     init {

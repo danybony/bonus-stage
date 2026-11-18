@@ -74,6 +74,7 @@ data class GameDetail(
     val released: String?,
     val players: Int?,
     val award: Award?,
+    val awardedAt: Instant?,
     val achievements: List<Achievement>,
 ) {
     val unlocked: Int get() = achievements.count { it.isUnlocked }

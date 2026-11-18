@@ -25,6 +25,9 @@ data object WishlistTab : TopLevel
 @Serializable
 data class GameDetail(val gameId: Long) : NavKey
 
+@Serializable
+data object Recap : NavKey
+
 /**
  * iOS has no reflection, so every destination must be registered here to be saved and restored.
  */
@@ -36,6 +39,7 @@ val navSavedStateConfiguration = SavedStateConfiguration {
             subclass(RecentTab::class, RecentTab.serializer())
             subclass(WishlistTab::class, WishlistTab.serializer())
             subclass(GameDetail::class, GameDetail.serializer())
+            subclass(Recap::class, Recap.serializer())
         }
     }
 }

@@ -12,5 +12,15 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/bonus_stage_widget" />
         </receiver>
+        <!-- Share cards: exposes cache/cards only, read access granted per share. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.cards"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/card_paths" />
+        </provider>
     </application>
 </manifest>

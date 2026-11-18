@@ -26,9 +26,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.bonysoft.bonusstage.domain.Achievement
 import net.bonysoft.bonusstage.domain.AchievementType
+import net.bonysoft.bonusstage.domain.Award
 import net.bonysoft.bonusstage.domain.GameDetail
 import net.bonysoft.bonusstage.resources.Res
 import net.bonysoft.bonusstage.resources.achievement_points
+import net.bonysoft.bonusstage.resources.award_tag_beaten
+import net.bonysoft.bonusstage.resources.award_tag_beaten_softcore
+import net.bonysoft.bonusstage.resources.award_tag_completed
+import net.bonysoft.bonusstage.resources.award_tag_mastered
+import net.bonysoft.bonusstage.resources.share_card
+import net.bonysoft.bonusstage.resources.share_text_award
 import net.bonysoft.bonusstage.resources.achievement_rate
 import net.bonysoft.bonusstage.resources.achievement_unlocked_on
 import net.bonysoft.bonusstage.resources.game_achievements
@@ -58,6 +65,7 @@ import net.bonysoft.bonusstage.ui.components.PixelIcon
 import net.bonysoft.bonusstage.ui.components.PixelIcons
 import net.bonysoft.bonusstage.ui.components.RefreshableContent
 import net.bonysoft.bonusstage.ui.components.RetroBadge
+import net.bonysoft.bonusstage.ui.components.RetroButton
 import net.bonysoft.bonusstage.ui.components.RetroChip
 import net.bonysoft.bonusstage.ui.components.RetroProgressBar
 import net.bonysoft.bonusstage.ui.components.RetroScaffold
@@ -68,6 +76,8 @@ import net.bonysoft.bonusstage.ui.components.StaleNotice
 import net.bonysoft.bonusstage.ui.components.asPercent
 import net.bonysoft.bonusstage.ui.components.color
 import net.bonysoft.bonusstage.ui.components.retroFrame
+import net.bonysoft.bonusstage.ui.share.GameAwardCard
+import net.bonysoft.bonusstage.ui.share.ShareCardDialog
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -100,13 +110,14 @@ fun GameDetailScreen(
 ) {
     // Achievements revealed one by one while spoilers are hidden; kept across rotation.
     var revealed by rememberSaveable { mutableStateOf(setOf<Long>()) }
+    var sharing by rememberSaveable { mutableStateOf(false) }
     val title = state.game?.let { splitTitleTag(it.title).second } ?: ""
     RetroScaffold(title = title, onBack = onBack, modifier = modifier) {
         RefreshableContent(data = state.game, status = state.status, onRefresh = onRefresh) { game ->
             LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 state.status.error?.let { error -> item(key = "stale") { StaleNotice(error) } }
                 item(key = "header") { GameHeader(game) }
-                item(key = "progress") { ProgressWindow(game) }
+                item(key = "progress") { ProgressWindow(game, onShare = { sharing = true }) }
                 item(key = "achievements-header") {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         Text(
@@ -136,6 +147,24 @@ fun GameDetailScreen(
                     )
                 }
             }
+        }
+    }
+    val game = state.game
+    val award = game?.award
+    if (sharing && game != null && award != null) {
+        val awardLabel = when (award) {
+            Award.Mastered -> stringResource(Res.string.award_tag_mastered)
+            Award.Completed -> stringResource(Res.string.award_tag_completed)
+            Award.BeatenHardcore -> stringResource(Res.string.award_tag_beaten)
+            Award.BeatenSoftcore -> stringResource(Res.string.award_tag_beaten_softcore)
+        }
+        ShareCardDialog(
+            fileName = "bonus-stage-${game.id}.png",
+            shareText = stringResource(Res.string.share_text_award, awardLabel, splitTitleTag(game.title).second),
+            imageCount = 1,
+            onDismiss = { sharing = false },
+        ) { onLoaded ->
+            GameAwardCard(game, award, state.username, game.awardedAt, onLoaded)
         }
     }
 }
@@ -175,7 +204,7 @@ private fun GameHeader(game: GameDetail) {
 }
 
 @Composable
-private fun ProgressWindow(game: GameDetail) {
+private fun ProgressWindow(game: GameDetail, onShare: () -> Unit) {
     val colors = RetroTheme.colors
     val total = game.achievements.size
     val progress = if (total == 0) 0f else game.unlocked.toFloat() / total
@@ -198,6 +227,12 @@ private fun ProgressWindow(game: GameDetail) {
             style = RetroTheme.typography.label,
             color = colors.onWindowMuted,
         )
+        if (game.award != null) {
+            Spacer(Modifier.height(12.dp))
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+                RetroButton(text = stringResource(Res.string.share_card), onClick = onShare)
+            }
+        }
     }
 }
 

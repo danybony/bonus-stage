@@ -52,6 +52,10 @@ class ApiContractTest {
         Check("user-recent-achievements", "API_GetUserRecentAchievements", ListSerializer(RecentAchievement.serializer())) {
             arrayOf("u" to it, "m" to 60 * 24 * 30)
         },
+        Check("achievements-earned-between", "API_GetAchievementsEarnedBetween", ListSerializer(RecentAchievement.serializer())) {
+            val now = System.currentTimeMillis() / 1000
+            arrayOf("u" to it, "f" to now - 30L * 24 * 3600, "t" to now)
+        },
         Check("user-want-to-play-list", "API_GetUserWantToPlayList", Page.serializer(WantToPlayGame.serializer())) {
             arrayOf("u" to it, "c" to 20)
         },
