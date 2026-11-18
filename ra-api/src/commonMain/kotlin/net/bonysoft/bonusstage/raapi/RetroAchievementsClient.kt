@@ -112,6 +112,22 @@ class RetroAchievementsClient(
         vararg params: Pair<String, Any>,
         override: RaCredentials? = null,
     ): T {
+        val body = fetch(endpoint, *params, override = override)
+        return try {
+            json.decodeFromString(deserializer, body)
+        } catch (e: SerializationException) {
+            throw RaApiException.UnexpectedResponse(e)
+        } catch (e: IllegalArgumentException) {
+            throw RaApiException.UnexpectedResponse(e)
+        }
+    }
+
+    /** Returns the raw response body. Used directly by the contract tests to snapshot the schema. */
+    internal suspend fun fetch(
+        endpoint: String,
+        vararg params: Pair<String, Any>,
+        override: RaCredentials? = null,
+    ): String {
         val auth = override ?: credentials() ?: throw RaApiException.Unauthorized()
         val response = throttler.throttle {
             try {
@@ -126,14 +142,7 @@ class RetroAchievementsClient(
             }
         }
         checkStatus(response)
-        val body = response.bodyAsText()
-        return try {
-            json.decodeFromString(deserializer, body)
-        } catch (e: SerializationException) {
-            throw RaApiException.UnexpectedResponse(e)
-        } catch (e: IllegalArgumentException) {
-            throw RaApiException.UnexpectedResponse(e)
-        }
+        return response.bodyAsText()
     }
 
     private fun checkStatus(response: HttpResponse) {
