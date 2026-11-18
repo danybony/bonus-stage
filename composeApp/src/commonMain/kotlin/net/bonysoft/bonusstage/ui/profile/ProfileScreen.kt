@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.bonysoft.bonusstage.domain.AwardCounts
 import net.bonysoft.bonusstage.domain.Profile
@@ -49,6 +50,12 @@ import net.bonysoft.bonusstage.resources.profile_softcore
 import net.bonysoft.bonusstage.resources.profile_title
 import net.bonysoft.bonusstage.resources.profile_true_points
 import net.bonysoft.bonusstage.resources.profile_unranked
+import net.bonysoft.bonusstage.resources.effect_crt
+import net.bonysoft.bonusstage.resources.effect_lcd
+import net.bonysoft.bonusstage.resources.effect_menu
+import net.bonysoft.bonusstage.resources.effect_off
+import net.bonysoft.bonusstage.resources.effect_scanlines
+import net.bonysoft.bonusstage.resources.effect_title
 import net.bonysoft.bonusstage.resources.recap_title
 import net.bonysoft.bonusstage.resources.sign_out
 import net.bonysoft.bonusstage.resources.sign_out_text
@@ -67,6 +74,7 @@ import net.bonysoft.bonusstage.ui.components.RetroMenuItem
 import net.bonysoft.bonusstage.ui.components.RetroScaffold
 import net.bonysoft.bonusstage.ui.components.RetroTag
 import net.bonysoft.bonusstage.ui.components.RetroWindow
+import net.bonysoft.bonusstage.ui.effects.ScreenEffect
 import net.bonysoft.bonusstage.ui.components.StaleNotice
 import net.bonysoft.bonusstage.ui.components.retroFrame
 import net.bonysoft.bonusstage.ui.theme.RetroTheme
@@ -87,6 +95,7 @@ fun ProfileRoute(
         onRefresh = viewModel::refresh,
         onOpenGame = onOpenGame,
         onOpenRecap = onOpenRecap,
+        onSelectEffect = viewModel::setScreenEffect,
         onSignOut = viewModel::signOut,
         modifier = modifier,
     )
@@ -98,10 +107,12 @@ fun ProfileScreen(
     onRefresh: () -> Unit,
     onOpenGame: (Long) -> Unit,
     onOpenRecap: () -> Unit,
+    onSelectEffect: (ScreenEffect) -> Unit,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var confirmSignOut by rememberSaveable { mutableStateOf(false) }
+    var pickEffect by rememberSaveable { mutableStateOf(false) }
     RetroScaffold(title = stringResource(Res.string.profile_title), modifier = modifier) {
         RefreshableContent(data = state.profile, status = state.status, onRefresh = onRefresh) { profile ->
             LazyColumn(
@@ -119,8 +130,28 @@ fun ProfileScreen(
                 item(key = "options") {
                     RetroWindow(title = stringResource(Res.string.profile_options), modifier = Modifier.fillMaxWidth()) {
                         RetroMenuItem(text = stringResource(Res.string.recap_title), onClick = onOpenRecap)
+                        RetroMenuItem(
+                            text = stringResource(Res.string.effect_menu, effectLabel(state.screenEffect)),
+                            onClick = { pickEffect = true },
+                        )
                         RetroMenuItem(text = stringResource(Res.string.sign_out), onClick = { confirmSignOut = true })
                     }
+                }
+            }
+        }
+    }
+    if (pickEffect) {
+        Dialog(onDismissRequest = { pickEffect = false }) {
+            RetroWindow(title = stringResource(Res.string.effect_title)) {
+                ScreenEffect.entries.forEach { effect ->
+                    RetroMenuItem(
+                        text = effectLabel(effect),
+                        selected = effect == state.screenEffect,
+                        onClick = {
+                            onSelectEffect(effect)
+                            pickEffect = false
+                        },
+                    )
                 }
             }
         }
@@ -254,6 +285,16 @@ private fun RecentlyPlayedWindow(games: List<RecentlyPlayedGame>, onOpenGame: (L
     }
 }
 
+@Composable
+private fun effectLabel(effect: ScreenEffect): String = stringResource(
+    when (effect) {
+        ScreenEffect.Off -> Res.string.effect_off
+        ScreenEffect.Lcd -> Res.string.effect_lcd
+        ScreenEffect.Scanlines -> Res.string.effect_scanlines
+        ScreenEffect.Crt -> Res.string.effect_crt
+    },
+)
+
 @Preview
 @Composable
 private fun ProfileScreenPreview() {
@@ -269,7 +310,7 @@ private fun ProfileScreenPreview() {
                 isDemo = true,
                 status = RefreshStatus(),
             ),
-            onRefresh = {}, onOpenGame = {}, onOpenRecap = {}, onSignOut = {},
+            onRefresh = {}, onOpenGame = {}, onOpenRecap = {}, onSelectEffect = {}, onSignOut = {},
         )
     }
 }

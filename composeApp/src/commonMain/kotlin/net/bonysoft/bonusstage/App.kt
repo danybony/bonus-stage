@@ -19,6 +19,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import net.bonysoft.bonusstage.data.account.AccountRepository
 import net.bonysoft.bonusstage.data.account.Session
+import net.bonysoft.bonusstage.data.repository.SettingsRepository
 import net.bonysoft.bonusstage.navigation.GameDetail
 import net.bonysoft.bonusstage.navigation.LibraryTab
 import net.bonysoft.bonusstage.navigation.ProfileTab
@@ -35,6 +36,8 @@ import net.bonysoft.bonusstage.resources.tab_wishlist
 import net.bonysoft.bonusstage.ui.components.PixelIcons
 import net.bonysoft.bonusstage.ui.components.RetroTab
 import net.bonysoft.bonusstage.ui.components.RetroTabBar
+import net.bonysoft.bonusstage.ui.effects.ScreenEffect
+import net.bonysoft.bonusstage.ui.effects.screenEffect
 import net.bonysoft.bonusstage.ui.game.GameDetailRoute
 import net.bonysoft.bonusstage.ui.library.LibraryRoute
 import net.bonysoft.bonusstage.ui.profile.ProfileRoute
@@ -47,14 +50,21 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
-fun App(modifier: Modifier = Modifier, accounts: AccountRepository = koinInject()) {
+fun App(
+    modifier: Modifier = Modifier,
+    accounts: AccountRepository = koinInject(),
+    settings: SettingsRepository = koinInject(),
+) {
     RetroTheme {
         val session by accounts.session.collectAsStateWithLifecycle()
-        when (val current = session) {
-            Session.Loading -> Box(modifier.fillMaxSize().background(RetroTheme.colors.background))
-            Session.SignedOut -> SignInRoute(modifier)
-            // A new back stack per account, so nothing of the previous user survives a sign-out.
-            is Session.SignedIn -> key(current.account.ulid) { SignedInApp(modifier) }
+        val effect by settings.screenEffect.collectAsStateWithLifecycle(initialValue = ScreenEffect.Off)
+        Box(modifier.fillMaxSize().screenEffect(effect)) {
+            when (val current = session) {
+                Session.Loading -> Box(Modifier.fillMaxSize().background(RetroTheme.colors.background))
+                Session.SignedOut -> SignInRoute()
+                // A new back stack per account, so nothing of the previous user survives a sign-out.
+                is Session.SignedIn -> key(current.account.ulid) { SignedInApp() }
+            }
         }
     }
 }
