@@ -153,7 +153,7 @@ object DemoData {
     private val wishlist = listOf(
         WantToPlayGame(1448, "Mega Man", "/Images/024519.png", 7, "NES / Famicom", 80, 8),
         WantToPlayGame(26971, "~Homebrew~ No Place To Hide", "/Images/084916.png", 18, "Nintendo DS", 0, 0),
-        WantToPlayGame(2865, "~Hack~ Plumber For All Seasons, A", "/Images/029113.png", 3, "SNES / Super Famicom", 0, 0),
+        WantToPlayGame(2865, "~Hack~ Plumber For All Seasons, A", "/Images/000001.png", 3, "SNES / Super Famicom", 0, 0),
         WantToPlayGame(3684, "Advanced Busterhawk: Gley Lancer", "/Images/020895.png", 1, "Mega Drive / Genesis", 58, 5),
     )
 

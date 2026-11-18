@@ -106,4 +106,26 @@
     <string name="recent_yesterday">YESTERDAY</string>
     <string name="recent_day_summary">%1$s unlocks · %2$s pts</string>
     <string name="recent_empty">No achievements in the last two weeks. Time to play!</string>
+
+    <string name="wishlist_title">Wishlist</string>
+    <string name="wishlist_in_development">SET IN DEVELOPMENT</string>
+    <string name="wishlist_ready">READY TO PLAY</string>
+    <string name="wishlist_waiting">WAITING FOR A SET</string>
+    <string name="wishlist_status_in_development">In development by %1$s</string>
+    <string name="wishlist_status_revision">Revision by %1$s</string>
+    <string name="wishlist_status_expected">Claim ends %1$s</string>
+    <string name="wishlist_status_published">%1$s achievements · %2$s pts</string>
+    <string name="wishlist_status_no_set">No set yet</string>
+    <string name="wishlist_empty">Your Want to Play list is empty. Add games on retroachievements.org and they will show up here.</string>
+    <string name="wishlist_alerts_title">SET ALERTS</string>
+    <string name="wishlist_alerts_text">Get a notification when a game on this list goes into development or its achievements are published. Checked a few times a day.</string>
+    <string name="wishlist_alerts_enable">Turn on alerts</string>
+    <string name="wishlist_alerts_denied">Notifications are off for Bonus Stage. Turn them on in the system settings to get set alerts.</string>
+
+    <string name="notification_channel_name">Set alerts</string>
+    <string name="notification_channel_description">A game on your wishlist goes into development or gets its achievements.</string>
+    <string name="notification_in_development_title">Set in development: %1$s</string>
+    <string name="notification_in_development_text">%1$s is making achievements for this game.</string>
+    <string name="notification_published_title">New set: %1$s</string>
+    <string name="notification_published_text">%1$s achievements are live. Time to play!</string>
 </resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: development hooks driven from adb. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <receiver
+            android:name=".debug.DebugCommandsReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver"
+            xmlns:tools="http://schemas.android.com/tools">
+            <intent-filter>
+                <action android:name="net.bonysoft.bonusstage.debug.CHECK_WISHLIST" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

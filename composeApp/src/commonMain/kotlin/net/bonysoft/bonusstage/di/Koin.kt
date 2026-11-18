@@ -5,6 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import net.bonysoft.bonusstage.data.account.AccountRepository
 import net.bonysoft.bonusstage.data.account.UserDataCleaner
+import net.bonysoft.bonusstage.data.alerts.BackgroundCheckCoordinator
+import net.bonysoft.bonusstage.data.alerts.WishlistAlertChecker
 import net.bonysoft.bonusstage.data.cache.RefreshPolicy
 import net.bonysoft.bonusstage.data.cache.Refresher
 import net.bonysoft.bonusstage.data.repository.CacheCleaner
@@ -20,6 +22,7 @@ import net.bonysoft.bonusstage.ui.library.LibraryViewModel
 import net.bonysoft.bonusstage.ui.profile.ProfileViewModel
 import net.bonysoft.bonusstage.ui.recent.RecentViewModel
 import net.bonysoft.bonusstage.ui.signin.SignInViewModel
+import net.bonysoft.bonusstage.ui.wishlist.WishlistViewModel
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -48,6 +51,8 @@ val dataModule = module {
     single { RecentAchievementsRepository(get(), get(), get(), get()) }
     single { WishlistRepository(get(), get(), get(), get()) }
     single { SettingsRepository(get()) }
+    single { WishlistAlertChecker(get(), get(), get()) }
+    single(createdAtStart = true) { BackgroundCheckCoordinator(get(), get(), get()) }
 }
 
 val uiModule = module {
@@ -55,6 +60,7 @@ val uiModule = module {
     viewModelOf(::ProfileViewModel)
     viewModelOf(::LibraryViewModel)
     viewModelOf(::RecentViewModel)
+    viewModelOf(::WishlistViewModel)
     viewModel { (gameId: Long) -> GameDetailViewModel(gameId, get(), get()) }
 }
 
