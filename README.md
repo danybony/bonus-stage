@@ -1,6 +1,10 @@
-# Bonus Stage
+<p align="center"><img src="docs/images/icon.png" width="96" height="96" alt="Bonus Stage icon: a pixel-art trophy"></p>
+
+<h1 align="center">Bonus Stage</h1>
 
 An unofficial companion app for [RetroAchievements](https://retroachievements.org), built with Kotlin Multiplatform and Compose Multiplatform. One shared codebase for Android and iOS.
+
+![Bonus Stage screens with the demo profile: profile, library, game detail, achievements, recent unlocks, wishlist and the home screen widget](docs/images/screenshots.png)
 
 ## What it does
 
@@ -15,6 +19,12 @@ An unofficial companion app for [RetroAchievements](https://retroachievements.or
 - Works offline from a local cache, refreshed in the background
 
 All of it wrapped in a retro look: pixel fonts, screens styled after the menus of classic games, optional LCD, scanline and CRT effects.
+
+## Screen effects
+
+Optional effects in the profile options, drawn with a shader on top of the whole app: an LCD pixel grid, scanlines, and a CRT with curvature, colour fringing and vignette. They are off by default.
+
+![The game screen with each screen effect: off, LCD, scanlines and CRT](docs/images/screen-effects.png)
 
 ## Download
 
