@@ -64,7 +64,7 @@ val dataModule = module {
     single { SettingsRepository(get()) }
     single { FriendsRepository(get(), get(), get(), get()) }
     single { RecapRepository(get()) }
-    // RomLibrary comes from the platform (Android only for now); resolved only when scanning.
+    // RomLibrary comes from the platform; resolved only when scanning.
     single { CatalogRepository(get(), get(), get(), get()) }
     single { RomScanRepository(get(), get(), get()) }
     single { WishlistAlertChecker(get(), get(), get()) }

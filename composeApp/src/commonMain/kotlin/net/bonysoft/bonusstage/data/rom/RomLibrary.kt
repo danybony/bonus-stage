@@ -9,8 +9,7 @@ data class RomFile(val id: String, val name: String, val size: Long)
 data class RomHash(val consoleId: Int, val hash: String)
 
 /**
- * Reads the user's ROM folder and hashes its files with rcheevos rhash. Only provided where a
- * native rhash is available (Android for now): resolve it with `getOrNull`.
+ * Reads the user's ROM folder and hashes its files with rcheevos rhash, provided by each platform.
  */
 interface RomLibrary {
     suspend fun listFiles(folder: String): List<RomFile>

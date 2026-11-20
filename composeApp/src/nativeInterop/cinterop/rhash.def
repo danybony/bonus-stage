@@ -1,0 +1,6 @@
+# rcheevos rhash (MIT, git submodule in third_party/rcheevos) for iOS, behind the bs_rhash wrapper.
+# composeApp/build.gradle.kts builds librhash.a with Xcode's clang for each iOS target.
+headers = bs_rhash.h
+headerFilter = bs_rhash.h
+package = net.bonysoft.bonusstage.rhash
+staticLibraries = librhash.a
