@@ -1,7 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
 }
+
+// Release signing and version come from environment variables (CI, from repository secrets) or
+// local.properties (local builds). Never commit a keystore or its passwords.
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
+}
+
+fun release(name: String): String? = System.getenv(name) ?: localProperties.getProperty(name)
 
 android {
     namespace = "net.bonysoft.bonusstage"
@@ -11,13 +21,28 @@ android {
         applicationId = "net.bonysoft.bonusstage"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "0.1.0"
+        // The release workflow sets both from the tag and the run number.
+        versionCode = release("BONUS_STAGE_VERSION_CODE")?.toInt() ?: 1
+        versionName = release("BONUS_STAGE_VERSION_NAME") ?: "0.1.0"
+    }
+    signingConfigs {
+        val keystore = release("BONUS_STAGE_KEYSTORE")
+        if (keystore != null) {
+            create("release") {
+                storeFile = file(keystore)
+                storePassword = release("BONUS_STAGE_KEYSTORE_PASSWORD")
+                keyAlias = release("BONUS_STAGE_KEY_ALIAS")
+                keyPassword = release("BONUS_STAGE_KEY_PASSWORD")
+            }
+        }
     }
     buildTypes {
         release {
             isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // Unsigned when no keystore is configured (for example in pull request CI).
+            signingConfig = signingConfigs.findByName("release")
         }
     }
     compileOptions {

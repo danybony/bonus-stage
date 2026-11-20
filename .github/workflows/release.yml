@@ -1,0 +1,52 @@
+name: Release
+
+# Push a tag such as v0.2.0 (or v0.3.0-beta.1 for a pre-release) to publish a signed APK.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: Signed Android release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Tests
+        run: ./gradlew :composeApp:testAndroidHostTest :ra-api:jvmTest :ra-api:testAndroidHostTest
+      - name: Build the signed APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.BONUS_STAGE_KEYSTORE_BASE64 }}
+          BONUS_STAGE_KEYSTORE_PASSWORD: ${{ secrets.BONUS_STAGE_KEYSTORE_PASSWORD }}
+          BONUS_STAGE_KEY_ALIAS: ${{ secrets.BONUS_STAGE_KEY_ALIAS }}
+          BONUS_STAGE_KEY_PASSWORD: ${{ secrets.BONUS_STAGE_KEY_PASSWORD }}
+          # Run numbers only grow, so each release installs over the previous one.
+          BONUS_STAGE_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then echo "::error::The BONUS_STAGE_KEYSTORE_BASE64 secret is missing"; exit 1; fi
+          export BONUS_STAGE_KEYSTORE="$RUNNER_TEMP/release.jks"
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$BONUS_STAGE_KEYSTORE"
+          export BONUS_STAGE_VERSION_NAME="${GITHUB_REF_NAME#v}"
+          ./gradlew :androidApp:assembleRelease
+          mkdir -p dist
+          cp androidApp/build/outputs/apk/release/androidApp-release.apk "dist/bonus-stage-$BONUS_STAGE_VERSION_NAME.apk"
+          # Turns obfuscated stack traces from bug reports back into readable ones.
+          cp androidApp/build/outputs/mapping/release/mapping.txt "dist/mapping-$BONUS_STAGE_VERSION_NAME.txt"
+          rm "$BONUS_STAGE_KEYSTORE"
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then prerelease="--prerelease"; fi
+          gh release create "$GITHUB_REF_NAME" dist/* --title "Bonus Stage ${GITHUB_REF_NAME#v}" --generate-notes $prerelease
