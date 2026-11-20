@@ -40,6 +40,8 @@ kotlin {
         }
         iosTarget.compilations.getByName("main").cinterops.create("rhash") {
             includeDirs(rcheevos.resolve("include"), rcheevos.resolve("src"))
+            // Compiling C sources into the interop library needs the indirect call mode.
+            extraOpts("-Xccall-mode", "indirect")
             rhashSources.forEach { extraOpts("-Xcompile-source", it.path) }
             extraOpts("-Xsource-compiler-option", "-I${rcheevos.resolve("include")}")
             extraOpts("-Xsource-compiler-option", "-I${rcheevos.resolve("src")}")
