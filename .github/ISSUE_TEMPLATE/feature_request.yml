@@ -1,0 +1,11 @@
+name: Feature request
+description: An idea for the app
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What you would like and why. If it needs data from RetroAchievements, check that the Web API provides it (https://api-docs.retroachievements.org/).
+    validations:
+      required: true
