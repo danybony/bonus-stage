@@ -11,7 +11,7 @@ import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNUserNotificationCenter
 
-/** Local notifications on iOS. Background scheduling (BGTaskScheduler) comes with the iOS release. */
+/** Local notifications on iOS; BgTaskBackgroundChecks runs the check in the background. */
 class IosAlertNotifier : AlertNotifier {
     override suspend fun notify(alerts: List<WishlistAlert>) {
         val center = UNUserNotificationCenter.currentNotificationCenter()
@@ -35,10 +35,4 @@ class IosAlertNotifier : AlertNotifier {
             )
         }
     }
-}
-
-/** No periodic check on iOS yet; see IosAlertNotifier. */
-class NoBackgroundChecks : BackgroundChecks {
-    override fun schedule() = Unit
-    override fun cancel() = Unit
 }
