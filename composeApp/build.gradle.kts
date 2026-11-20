@@ -23,30 +23,46 @@ kotlin {
         withHostTestBuilder {}
     }
 
-    // rcheevos rhash for the ROM scan; on Android it is built with CMake in androidApp.
+    // rcheevos rhash for the ROM scan; on Android it is built with CMake in androidApp. On iOS it
+    // is built into a static library with Xcode's clang (macOS only, like every Apple cinterop).
     val rcheevos = rootProject.file("third_party/rcheevos")
+    val interopDir = file("src/nativeInterop/cinterop")
     val rhashSources = listOf(
-        "rc_compat.c", "rhash/aes.c", "rhash/cdreader.c", "rhash/hash.c", "rhash/hash_disc.c",
-        "rhash/hash_encrypted.c", "rhash/hash_rom.c", "rhash/hash_zip.c", "rhash/md5.c",
-    ).map { rcheevos.resolve("src/$it") }
+        "src/rc_compat.c", "src/rhash/aes.c", "src/rhash/cdreader.c", "src/rhash/hash.c",
+        "src/rhash/hash_disc.c", "src/rhash/hash_encrypted.c", "src/rhash/hash_rom.c",
+        "src/rhash/hash_zip.c", "src/rhash/md5.c",
+    ).map { rcheevos.resolve(it) } + interopDir.resolve("bs_rhash.c")
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64(),
-    ).forEach { iosTarget ->
+    // Each iOS target with its Xcode SDK and clang target; the minimum version matches the Xcode project.
+    val iosTargets = mapOf(
+        iosArm64() to ("iphoneos" to "arm64-apple-ios16.0"),
+        iosSimulatorArm64() to ("iphonesimulator" to "arm64-apple-ios16.0-simulator"),
+    )
+    iosTargets.forEach { (iosTarget, sdkAndTriple) ->
+        val (sdk, triple) = sdkAndTriple
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
         }
+        val libDir = layout.buildDirectory.dir("rhash/${iosTarget.name}")
+        val buildRhash = tasks.register<Exec>("buildRhash${iosTarget.name.replaceFirstChar(Char::uppercase)}") {
+            inputs.files(rhashSources, interopDir.resolve("bs_rhash.h"))
+            outputs.dir(libDir)
+            val out = libDir.get().asFile
+            val compile = rhashSources.joinToString(" && ") { source ->
+                "xcrun --sdk $sdk clang -target $triple -O2 -I${rcheevos.resolve("include")} " +
+                    "-I${rcheevos.resolve("src")} -I$interopDir -c ${source.path} -o $out/obj/${source.nameWithoutExtension}.o"
+            }
+            commandLine(
+                "sh", "-c",
+                "rm -rf $out && mkdir -p $out/obj && $compile && " +
+                    "xcrun --sdk $sdk libtool -static -o $out/librhash.a $out/obj/*.o",
+            )
+        }
         iosTarget.compilations.getByName("main").cinterops.create("rhash") {
-            includeDirs(rcheevos.resolve("include"), rcheevos.resolve("src"))
-            compilerOpts("-I${rcheevos.resolve("include")}", "-I${rcheevos.resolve("src")}")
-            // Compiling C sources into the interop library needs the indirect call mode.
-            extraOpts("-Xccall-mode", "indirect")
-            rhashSources.forEach { extraOpts("-Xcompile-source", it.path) }
-            extraOpts("-Xsource-compiler-option", "-I${rcheevos.resolve("include")}")
-            extraOpts("-Xsource-compiler-option", "-I${rcheevos.resolve("src")}")
-            extraOpts("-Xsource-compiler-option", "-O2")
+            includeDirs(interopDir)
+            extraOpts("-libraryPath", libDir.get().asFile.path)
+            tasks.named(interopProcessingTaskName) { dependsOn(buildRhash) }
         }
     }
 
